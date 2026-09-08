@@ -40,28 +40,40 @@
 </head>
 <body>
 
+  <!-- Logo PNG -->
   <img src="logo.png" alt="Logo" class="loader-png">
+
+  <!-- Scritta sotto il logo -->
   <div class="brand-text">Armadillo Interactive</div>
 
+  <!-- Script di reindirizzamento con attesa di 3 secondi -->
   <script>
-  // 1. Avvia il timer da 3 secondi subito all'apertura della pagina
-  const timer3Secondi = new Promise(resolve => setTimeout(resolve, 3000));
+    // 1. Timer di 3 secondi esatti
+    const timer3Secondi = new Promise(resolve => setTimeout(resolve, 3000));
 
-  // 2. Scarica il link da stream.json in parallelo
-  const recuperaLink = fetch('stream.json?t=' + Date.now())
-    .then(response => response.json())
-    .then(data => data.url);
+    // 2. Download del file stream.json
+    const recuperaLink = fetch('stream.json?t=' + Date.now())
+      .then(response => {
+        if (!response.ok) {
+          throw new Error("Impossibile leggere il file stream.json (Codice: " + response.status + ")");
+        }
+        return response.json();
+      })
+      .then(data => data.url);
 
-  // 3. Esegui il reindirizzamento solo quando ENTRAMBE le azioni sono uscite con successo
-  Promise.all([timer3Secondi, recuperaLink])
-    .then(([_, url]) => {
-      if (url) {
-        window.location.href = url;
-      }
-    })
-    .catch(err => {
-      console.error("Errore nel caricamento del link:", err);
-    });
-</script>
+    // 3. Esegue il reindirizzamento solo dopo i 3 secondi E dopo aver letto il JSON
+    Promise.all([timer3Secondi, recuperaLink])
+      .then(([_, url]) => {
+        if (url) {
+          window.location.href = url;
+        } else {
+          console.error("Campo 'url' non trovato dentro stream.json");
+        }
+      })
+      .catch(err => {
+        console.error("Errore durante il caricamento:", err);
+      });
+  </script>
+
 </body>
 </html>
