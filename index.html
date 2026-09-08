@@ -17,6 +17,7 @@
       width: 100vw;
       overflow: hidden;
       font-family: "Gill Sans Extrabold", sans-serif; /* Font */
+      color: #ffffff;
     }
 
     .loader-png {
@@ -26,45 +27,74 @@
       height: auto;
       object-fit: contain;
     }
- 
-    /* Stile per la scritta Armadillo Interactive */
+
     .brand-text {
       margin-top: 8px;
-      color: #ffffff;
       font-size: 2.2rem;
       font-weight: 600;
       letter-spacing: 2px;
       text-transform: sentencecase;
       text-align: center;
     }
+
+    /* Scritta con il conteggio */
+    .counter-text {
+      margin-top: 12px;
+      font-size: 1rem;
+      opacity: 0.6;
+    }
   </style>
 </head>
 <body>
-  
-  <!-- Logo PNG -->
+
+  <!-- Logo e Scritta -->
   <img src="logo.png" alt="Logo" class="loader-png">
   <div class="brand-text">Armadillo Interactive</div>
+  
+  <!-- Indicatore visivo del timer -->
+  <div class="counter-text" id="status">Reindirizzamento in 3...</div>
 
-<script>
-  // 1. Avvia il timer da 3 secondi subito all'apertura della pagina
-  const timer3Secondi = new Promise(resolve => setTimeout(resolve, 3000));
+  <script>
+    async function avvia() {
+      let secondi = 3;
+      const statusEl = document.getElementById('status');
 
-  // 2. Scarica il link da stream.json in parallelo
-  const recuperaLink = fetch('stream.json?t=' + Date.now())
-    .then(response => response.json())
-    .then(data => data.url);
+      // 1. Avvia il download del JSON in background
+      const fetchLink = fetch('stream.json?t=' + Date.now())
+        .then(res => res.json())
+        .then(data => data.url)
+        .catch(err => {
+          console.error("Errore fetch:", err);
+          return null;
+        });
 
-  // 3. Esegui il reindirizzamento solo quando ENTRAMBE le azioni sono uscite con successo
-  Promise.all([timer3Secondi, recuperaLink])
-    .then(([_, url]) => {
-      if (url) {
-        window.location.href = url;
+      // 2. Timer visivo di 3 secondi (1 secondo per ogni tick)
+      const timer = new Promise(resolve => {
+        const intervallo = setInterval(() => {
+          secondi--;
+          if (secondi > 0) {
+            statusEl.textContent = `Reindirizzamento in ${secondi}...`;
+          } else {
+            clearInterval(intervallo);
+            statusEl.textContent = "Connessione in corso...";
+            resolve();
+          }
+        }, 1000);
+      });
+
+      // 3. Aspetta sia lo scadere del timer che il caricamento del link
+      const [_, targetUrl] = await Promise.all([timer, fetchLink]);
+
+      // 4. Reindirizza
+      if (targetUrl) {
+        window.location.href = targetUrl;
+      } else {
+        statusEl.textContent = "Errore: Link non trovato in stream.json";
       }
-    })
-    .catch(err => {
-      console.error("Errore nel caricamento del link:", err);
-    });
-</script>
+    }
+
+    avvia();
+  </script>
 
 </body>
 </html>
