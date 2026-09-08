@@ -43,6 +43,75 @@
   <!-- Logo PNG -->
   <img src="logo.png" alt="Logo" class="loader-png">
 
+  <!-- Scritta -->
+  <div class="brand-text">Armadillo Interactive</div>
+
+  <!-- Script con timer forzato di 3 secondi -->
+  <script>
+    // Forza il timer di 3000 millisecondi (3 secondi)
+    const timer = new Promise(resolve => setTimeout(resolve, 3000));
+
+    // Recupera l'URL dal JSON
+    const fetchUrl = fetch('stream.json?t=' + Date.now())
+      .then(res => res.json())
+      .then(data => data.url);
+
+    // Reindirizza SOLO dopo che il timer di 3 secondi è scaduto
+    Promise.all([timer, fetchUrl])
+      .then(([_, url]) => {
+        if (url) {
+          window.location.href = url;
+        }
+      })
+      .catch(err => console.error("Errore:", err));
+  </script>
+
+</body>
+</html><!DOCTYPE html>
+<html lang="it">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Caricamento...</title>
+  <style>
+    body {
+      margin: 0;
+      padding: 0;
+      background-color: #0f172a; 
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
+      width: 100vw;
+      overflow: hidden;
+      font-family: system-ui, -apple-system, sans-serif;
+    }
+
+    .loader-png {
+      max-width: 70vw;  
+      max-height: 60vh;
+      width: auto;
+      height: auto;
+      object-fit: contain;
+    }
+
+    .brand-text {
+      margin-top: 24px;
+      color: #ffffff;
+      font-size: 1.8rem;
+      font-weight: 600;
+      letter-spacing: 2px;
+      text-transform: uppercase;
+      text-align: center;
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Logo PNG -->
+  <img src="logo.png" alt="Logo" class="loader-png">
+
   <!-- Scritta sotto il logo -->
   <div class="brand-text">Armadillo Interactive</div>
 
