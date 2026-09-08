@@ -43,21 +43,26 @@
   <img src="logo.png" alt="Logo" class="loader-png">
   <div class="brand-text">Armadillo Interactive</div>
 
-  <script>
-    fetch('stream.json?t=' + Date.now())
-      .then(response => response.json())
-      .then(data => {
-        if (data.url) {
-          // Aspetta 3000 millisecondi (3 secondi) prima di reindirizzare
-          setTimeout(() => {
-            window.location.href = data.url;
-          }, 3000);
-        }
-      })
-      .catch(err => {
-        console.error("Errore nel caricamento del link:", err);
-      });
-  </script>
+<script>
+  // 1. Avvia il timer da 3 secondi subito all'apertura della pagina
+  const timer3Secondi = new Promise(resolve => setTimeout(resolve, 3000));
+
+  // 2. Scarica il link da stream.json in parallelo
+  const recuperaLink = fetch('stream.json?t=' + Date.now())
+    .then(response => response.json())
+    .then(data => data.url);
+
+  // 3. Esegui il reindirizzamento solo quando ENTRAMBE le azioni sono uscite con successo
+  Promise.all([timer3Secondi, recuperaLink])
+    .then(([_, url]) => {
+      if (url) {
+        window.location.href = url;
+      }
+    })
+    .catch(err => {
+      console.error("Errore nel caricamento del link:", err);
+    });
+</script>
 
 </body>
 </html>
