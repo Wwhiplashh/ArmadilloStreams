@@ -40,109 +40,29 @@
 </head>
 <body>
 
-  <!-- Logo PNG -->
   <img src="logo.png" alt="Logo" class="loader-png">
-
-  <!-- Scritta -->
   <div class="brand-text">Armadillo Interactive</div>
 
-  <!-- Script con timer forzato di 3 secondi -->
-  <script>
-    // Forza il timer di 3000 millisecondi (3 secondi)
-    const timer = new Promise(resolve => setTimeout(resolve, 3000));
+<script>
+  // 1. Avvia il timer da 3 secondi subito all'apertura della pagina
+  const timer3Secondi = new Promise(resolve => setTimeout(resolve, 3000));
 
-    // Recupera l'URL dal JSON
-    const fetchUrl = fetch('stream.json?t=' + Date.now())
-      .then(res => res.json())
-      .then(data => data.url);
+  // 2. Scarica il link da stream.json in parallelo
+  const recuperaLink = fetch('stream.json?t=' + Date.now())
+    .then(response => response.json())
+    .then(data => data.url);
 
-    // Reindirizza SOLO dopo che il timer di 3 secondi è scaduto
-    Promise.all([timer, fetchUrl])
-      .then(([_, url]) => {
-        if (url) {
-          window.location.href = url;
-        }
-      })
-      .catch(err => console.error("Errore:", err));
-  </script>
-
-</body>
-</html><!DOCTYPE html>
-<html lang="it">
-<head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Caricamento...</title>
-  <style>
-    body {
-      margin: 0;
-      padding: 0;
-      background-color: #0f172a; 
-      display: flex;
-      flex-direction: column;
-      justify-content: center;
-      align-items: center;
-      height: 100vh;
-      width: 100vw;
-      overflow: hidden;
-      font-family: system-ui, -apple-system, sans-serif;
-    }
-
-    .loader-png {
-      max-width: 70vw;  
-      max-height: 60vh;
-      width: auto;
-      height: auto;
-      object-fit: contain;
-    }
-
-    .brand-text {
-      margin-top: 24px;
-      color: #ffffff;
-      font-size: 1.8rem;
-      font-weight: 600;
-      letter-spacing: 2px;
-      text-transform: uppercase;
-      text-align: center;
-    }
-  </style>
-</head>
-<body>
-
-  <!-- Logo PNG -->
-  <img src="logo.png" alt="Logo" class="loader-png">
-
-  <!-- Scritta sotto il logo -->
-  <div class="brand-text">Armadillo Interactive</div>
-
-  <!-- Script di reindirizzamento con attesa di 3 secondi -->
-  <script>
-    // 1. Timer di 3 secondi esatti
-    const timer3Secondi = new Promise(resolve => setTimeout(resolve, 3000));
-
-    // 2. Download del file stream.json
-    const recuperaLink = fetch('stream.json?t=' + Date.now())
-      .then(response => {
-        if (!response.ok) {
-          throw new Error("Impossibile leggere il file stream.json (Codice: " + response.status + ")");
-        }
-        return response.json();
-      })
-      .then(data => data.url);
-
-    // 3. Esegue il reindirizzamento solo dopo i 3 secondi E dopo aver letto il JSON
-    Promise.all([timer3Secondi, recuperaLink])
-      .then(([_, url]) => {
-        if (url) {
-          window.location.href = url;
-        } else {
-          console.error("Campo 'url' non trovato dentro stream.json");
-        }
-      })
-      .catch(err => {
-        console.error("Errore durante il caricamento:", err);
-      });
-  </script>
+  // 3. Esegui il reindirizzamento solo quando ENTRAMBE le azioni sono uscite con successo
+  Promise.all([timer3Secondi, recuperaLink])
+    .then(([_, url]) => {
+      if (url) {
+        window.location.href = url;
+      }
+    })
+    .catch(err => {
+      console.error("Errore nel caricamento del link:", err);
+    });
+</script>
 
 </body>
 </html>
