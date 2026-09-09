@@ -14,7 +14,7 @@ DOMINI_STREAM = [
 CANALI_SERVIZI = {
     "DAZN": "/watch.php?id=877",
     "Prime Video": "/watch.php?id=461",
-    "Mediaset": "/watch.php?id=893", ----- DA RISOLVERERE------
+    "Mediaset": "/watch.php?id=893", #----- DA RISOLVERERE------
     "Sky / NOW": "/watch.php?id=461"
 }
 
