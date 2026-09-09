@@ -94,7 +94,6 @@
     const REPO_USER = 'Wwhiplashh';
     const REPO_NAME = 'ArmadilloStreams';
 
-    // Se la pagina viene aperta come file locale (file://), usa l'URL Raw di GitHub, altrimenti usa i percorsi relativi su GitHub Pages
     const BASE_URL = window.location.protocol === 'file:' 
       ? `https://raw.githubusercontent.com/${REPO_USER}/${REPO_NAME}/main/`
       : './';
@@ -102,7 +101,6 @@
     const STREAM_JSON_URL = `${BASE_URL}stream.json`;
     const CALENDAR_JSON_URL = `${BASE_URL}calendar.json`;
 
-    // Formatta la data YYYY-MM-DD (es. "Domenica 20 settembre 2026")
     function formattaData(dataStr) {
       if (!dataStr) return '';
       const [anno, mese, giorno] = dataStr.split('-');
@@ -127,7 +125,6 @@
         const streamData = await response.json();
 
         if (streamData.attivo && streamData.url) {
-          // 🔴 OGGI C'È LA PARTITA
           let secondiRimanenti = 3;
 
           app.innerHTML = `
@@ -143,7 +140,6 @@
             </p>
           `;
 
-          // Conto alla rovescia e reindirizzamento automatico
           const timerEl = document.getElementById('countdown');
           const interval = setInterval(() => {
             secondiRimanenti--;
@@ -156,7 +152,6 @@
           }, 1000);
 
         } else {
-          // 🔵 OGGI NON C'È PARTITA: Cerca la prossima nel calendario
           try {
             const calResponse = await fetch(CALENDAR_JSON_URL, { cache: 'no-store' });
             if (!calResponse.ok) throw new Error(`HTTP ${calResponse.status} caricando calendar.json`);
