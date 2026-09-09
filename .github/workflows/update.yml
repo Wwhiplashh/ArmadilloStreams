@@ -37,5 +37,5 @@ jobs:
           git config --local user.email "action@github.com"
           git config --local user.name "GitHub Action"
           
-          git add calendario.json stream.json
+          git add calendar.json stream.json
           git diff --quiet && git diff --staged --quiet || (git commit -m "Auto-update partite Inter [skip ci]" && git push)
