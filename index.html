@@ -3,97 +3,163 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Caricamento...</title>
+  <title>Inter Stream Viewer</title>
   <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
     body {
-      margin: 0;
-      padding: 0;
-      background-color: #010E80; 
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+      background: linear-gradient(135deg, #020b18 0%, #081b3b 100%);
+      color: #ffffff;
+      min-height: 100vh;
       display: flex;
-      flex-direction: column;
       justify-content: center;
       align-items: center;
-      height: 95vh;
-      width: 100vw;
-      overflow: hidden;
-      font-family: "Gill Sans Extrabold", sans-serif; /* Font */
-      color: #ffffff;
+      padding: 20px;
     }
-
-    .loader-png {
-      max-width: 70vw;  
-      max-height: 70vh;
-      width: auto;
-      height: auto;
-      object-fit: contain;
-    }
-
-    .brand-text {
-      margin-top: 8px;
-      font-size: 2.2rem;
-      font-weight: 600;
-      letter-spacing: 2px;
-      text-transform: sentencecase;
+    .card {
+      background: rgba(13, 27, 54, 0.85);
+      border: 1px solid #1d4ed8;
+      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
+      border-radius: 16px;
+      padding: 35px;
+      max-width: 480px;
+      width: 100%;
       text-align: center;
+      backdrop-filter: blur(10px);
     }
-
-    /* Scritta con il conteggio */
-    .counter-text {
-      margin-top: 12px;
+    .badge {
+      display: inline-block;
+      padding: 6px 14px;
+      border-radius: 20px;
+      font-size: 0.85rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      margin-bottom: 20px;
+      letter-spacing: 0.5px;
+    }
+    .badge-active { background: #16a34a; color: #fff; }
+    .badge-next { background: #2563eb; color: #fff; }
+    .badge-inactive { background: #334155; color: #94a3b8; }
+    h1 { font-size: 1.6rem; font-weight: 800; margin-bottom: 12px; }
+    p { color: #94a3b8; font-size: 0.95rem; line-height: 1.6; margin-bottom: 20px; }
+    .btn {
+      display: block;
+      width: 100%;
+      padding: 14px 20px;
+      border-radius: 10px;
       font-size: 1rem;
-      opacity: 0.6;
+      font-weight: 700;
+      text-decoration: none;
+      transition: all 0.2s ease;
+      border: none;
+      cursor: pointer;
     }
+    .btn-live {
+      background: #16a34a;
+      color: #ffffff;
+      box-shadow: 0 4px 14px rgba(22, 163, 74, 0.4);
+    }
+    .btn-live:hover { background: #15803d; transform: translateY(-1px); }
+    .btn-disabled { background: #1e293b; color: #64748b; cursor: not-allowed; }
   </style>
 </head>
 <body>
 
-  <!-- Logo e Scritta -->
-  <img src="logo.png" alt="Logo" class="loader-png">
-  <div class="brand-text">Armadillo Interactive</div>
-  
-  <!-- Indicatore visivo del timer -->
-  <div class="counter-text" id="status">Reindirizzamento in 3...</div>
+  <div class="card" id="app">
+    <div class="badge badge-inactive">Verifica in corso...</div>
+    <h1>Connessione al server...</h1>
+  </div>
 
   <script>
-    async function avvia() {
-      let secondi = 3;
-      const statusEl = document.getElementById('status');
+    const RAW_BASE_URL = 'https://raw.githubusercontent.com/Wwhiplashh/FirefoxDanilo/main/';
+    const STREAM_JSON_URL = `${RAW_BASE_URL}stream.json`;
+    const CALENDAR_JSON_URL = `${RAW_BASE_URL}calendar.json`;
 
-      // 1. Avvia il download del JSON in background
-      const fetchLink = fetch('stream.json?t=' + Date.now())
-        .then(res => res.json())
-        .then(data => data.url)
-        .catch(err => {
-          console.error("Errore fetch:", err);
-          return null;
-        });
-
-      // 2. Timer visivo di 3 secondi (1 secondo per ogni tick)
-      const timer = new Promise(resolve => {
-        const intervallo = setInterval(() => {
-          secondi--;
-          if (secondi > 0) {
-            statusEl.textContent = `Reindirizzamento in ${secondi}...`;
-          } else {
-            clearInterval(intervallo);
-            statusEl.textContent = "Connessione in corso...";
-            resolve();
-          }
-        }, 1000);
+    // Funzione per formattare la data YYYY-MM-DD in formato leggibile italiano
+    function formattaData(dataStr) {
+      if (!dataStr) return '';
+      const [anno, mese, giorno] = dataStr.split('-');
+      const dataObj = new Date(anno, mese - 1, giorno);
+      return dataObj.toLocaleDateString('it-IT', {
+        weekday: 'capitalize',
+        day: 'numeric',
+        month: 'long',
+        year: 'numeric'
       });
+    }
 
-      // 3. Aspetta sia lo scadere del timer che il caricamento del link
-      const [_, targetUrl] = await Promise.all([timer, fetchLink]);
+    async function checkMatch() {
+      const app = document.getElementById('app');
 
-      // 4. Reindirizza
-      if (targetUrl) {
-        window.location.href = targetUrl;
-      } else {
-        statusEl.textContent = "Errore: Link non trovato in stream.json";
+      try {
+        // 1. Controlla stream.json per la giornata odierna
+        const response = await fetch(STREAM_JSON_URL, { cache: 'no-store' });
+        const streamData = await response.json();
+
+        if (streamData.attivo && streamData.url) {
+          // 🔴 OGGI C'È LA PARTITA
+          app.innerHTML = `
+            <span class="badge badge-active">🔴 In Diretta Oggi</span>
+            <h1>${streamData.partita}</h1>
+            <p>
+              <strong>Competizione:</strong> ${streamData.competizione}<br>
+              <strong>Trasmissione:</strong> ${streamData.servizio}
+            </p>
+            <a href="${streamData.url}" class="btn btn-live">AVVIA LO STREAMING</a>
+          `;
+        } else {
+          // 🔵 OGGI NON C'È PARTITA: Leggi il calendario per trovare il prossimo match
+          const dataOggi = streamData.data || new Date().toISOString().split('T')[0];
+          
+          try {
+            const calResponse = await fetch(CALENDAR_JSON_URL, { cache: 'no-store' });
+            const calendario = await calResponse.json();
+
+            // Cerca la prima partita con data strettamente futura
+            const prossimaPartita = calendario.find(p => p.data > dataOggi);
+
+            if (prossimaPartita) {
+              const dataFormattata = formattaData(prossimaPartita.data);
+
+              app.innerHTML = `
+                <span class="badge badge-next">Prossimo Match</span>
+                <h1>${prossimaPartita.partita}</h1>
+                <p>
+                  <strong>Data:</strong> ${dataFormattata}<br>
+                  <strong>Competizione:</strong> ${prossimaPartita.competizione}<br>
+                  <strong>Piattaforma:</strong> ${prossimaPartita.servizio}
+                </p>
+                <button disabled class="btn btn-disabled">Match Non Ancora Attivo</button>
+              `;
+            } else {
+              // Se la stagione è finita o il calendario non ha prossimi match
+              app.innerHTML = `
+                <span class="badge badge-inactive">Nessun Evento</span>
+                <h1>Nessuna partita in programma</h1>
+                <p>Non ci sono prossime partite registrate nel calendario.</p>
+                <button disabled class="btn btn-disabled">Nessuno Stream Attivo</button>
+              `;
+            }
+          } catch (calErr) {
+            // Fallback se il file calendar.json non è raggiungibile
+            app.innerHTML = `
+              <span class="badge badge-inactive">Nessun Evento</span>
+              <h1>Oggi l'Inter non gioca 😴</h1>
+              <p>Nessuno stream attivo per la giornata odierna.</p>
+              <button disabled class="btn btn-disabled">Nessuno Stream Attivo</button>
+            `;
+          }
+        }
+      } catch (err) {
+        app.innerHTML = `
+          <span class="badge badge-inactive">Errore</span>
+          <h1>Impossibile caricare i dati</h1>
+          <p>Verifica la connessione internet o riprova più tardi.</p>
+        `;
       }
     }
 
-    avvia();
+    checkMatch();
   </script>
 
 </body>
