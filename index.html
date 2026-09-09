@@ -39,9 +39,10 @@
     }
     .badge-active { background: #16a34a; color: #fff; }
     .badge-next { background: #2563eb; color: #fff; }
-    .badge-inactive { background: #334155; color: #94a3b8; }
+    .badge-inactive { background: #ef4444; color: #fff; }
     h1 { font-size: 1.6rem; font-weight: 800; margin-bottom: 12px; }
     p { color: #94a3b8; font-size: 0.95rem; line-height: 1.6; margin-bottom: 20px; }
+    .error-box { background: rgba(239, 68, 68, 0.1); border: 1px solid #ef4444; padding: 10px; border-radius: 8px; font-family: monospace; font-size: 0.8rem; color: #fca5a5; margin-top: 10px; text-align: left; word-break: break-all; }
     .btn {
       display: block;
       width: 100%;
@@ -54,11 +55,7 @@
       border: none;
       cursor: pointer;
     }
-    .btn-live {
-      background: #16a34a;
-      color: #ffffff;
-      box-shadow: 0 4px 14px rgba(22, 163, 74, 0.4);
-    }
+    .btn-live { background: #16a34a; color: #ffffff; box-shadow: 0 4px 14px rgba(22, 163, 74, 0.4); }
     .btn-live:hover { background: #15803d; transform: translateY(-1px); }
     .btn-disabled { background: #1e293b; color: #64748b; cursor: not-allowed; }
   </style>
@@ -66,16 +63,22 @@
 <body>
 
   <div class="card" id="app">
-    <div class="badge badge-inactive">Verifica in corso...</div>
+    <div class="badge badge-next">Verifica in corso...</div>
     <h1>Connessione al server...</h1>
   </div>
 
   <script>
-    const RAW_BASE_URL = 'https://raw.githubusercontent.com/Wwhiplashh/ArmadilloStreams/main/';
-    const STREAM_JSON_URL = './stream.json';
-    const CALENDAR_JSON_URL = './calendar.json';
+    const REPO_USER = 'Wwhiplashh';
+    const REPO_NAME = 'ArmadilloStreams';
 
-    // Funzione per formattare la data YYYY-MM-DD in formato leggibile italiano
+    // Se aperto come file locale (file://), usa l'URL Raw di GitHub, altrimenti usa il percorso relativo
+    const BASE_URL = window.location.protocol === 'file:' 
+      ? `https://raw.githubusercontent.com/${REPO_USER}/${REPO_NAME}/main/`
+      : './';
+
+    const STREAM_JSON_URL = `${BASE_URL}stream.json`;
+    const CALENDAR_JSON_URL = `${BASE_URL}calendar.json`;
+
     function formattaData(dataStr) {
       if (!dataStr) return '';
       const [anno, mese, giorno] = dataStr.split('-');
@@ -92,13 +95,11 @@
       const app = document.getElementById('app');
 
       try {
-        // 1. Controlla stream.json
         const response = await fetch(STREAM_JSON_URL, { cache: 'no-store' });
-        if (!response.ok) throw new Error(`Errore fetch stream.json: ${response.status}`);
+        if (!response.ok) throw new Error(`HTTP ${response.status} caricando stream.json (${STREAM_JSON_URL})`);
         const streamData = await response.json();
 
         if (streamData.attivo && streamData.url) {
-          // 🔴 OGGI C'È LA PARTITA
           app.innerHTML = `
             <span class="badge badge-active">🔴 In Diretta Oggi</span>
             <h1>${streamData.partita}</h1>
@@ -109,21 +110,16 @@
             <a href="${streamData.url}" class="btn btn-live">AVVIA LO STREAMING</a>
           `;
         } else {
-          // 🔵 OGGI NON C'È PARTITA: Cerca nel calendario
           try {
             const calResponse = await fetch(CALENDAR_JSON_URL, { cache: 'no-store' });
-            if (!calResponse.ok) throw new Error(`File calendario non trovato (${calResponse.status})`);
+            if (!calResponse.ok) throw new Error(`HTTP ${calResponse.status} caricando calendar.json (${CALENDAR_JSON_URL})`);
             
             const dataCal = await calResponse.json();
-            
-            // Gestisce sia il caso in cui il JSON sia un Array [...] sia un Oggetto { "partite": [...] }
             const calendario = Array.isArray(dataCal) ? dataCal : (dataCal.partite || []);
 
-            // Data di riferimento di oggi a mezzanotte
             const oggi = new Date();
             oggi.setHours(0, 0, 0, 0);
 
-            // Trova la prima partita con data maggiore o uguale a oggi
             const prossimaPartita = calendario.find(p => {
               if (!p.data) return false;
               const dataPartita = new Date(p.data);
@@ -148,26 +144,25 @@
               app.innerHTML = `
                 <span class="badge badge-inactive">Nessun Evento</span>
                 <h1>Nessuna partita in programma</h1>
-                <p>Non ci sono prossime partite registrate nel calendario.</p>
+                <p>Non ci sono prossime partite nel calendario.</p>
                 <button disabled class="btn btn-disabled">Nessuno Stream Attivo</button>
               `;
             }
           } catch (calErr) {
-            console.error("Errore caricamento calendario:", calErr);
             app.innerHTML = `
               <span class="badge badge-inactive">Errore Calendario</span>
-              <h1>Calendario non disponibile</h1>
-              <p>Impossibile recuperare la prossima partita (Verifica se il file si chiama calendar.json su GitHub).</p>
-              <button disabled class="btn btn-disabled">Nessuno Stream Attivo</button>
+              <h1>Errore nel caricamento del calendario</h1>
+              <p>Dettaglio dell'errore:</p>
+              <div class="error-box">${calErr.message}</div>
+              <button disabled class="btn btn-disabled" style="margin-top:15px">Nessuno Stream Attivo</button>
             `;
           }
         }
       } catch (err) {
-        console.error("Errore principale:", err);
         app.innerHTML = `
-          <span class="badge badge-inactive">Errore</span>
-          <h1>Impossibile caricare i dati</h1>
-          <p>Verifica la connessione o l'URL del repository.</p>
+          <span class="badge badge-inactive">Errore Stream</span>
+          <h1>Impossibile caricare stream.json</h1>
+          <div class="error-box">${err.message}</div>
         `;
       }
     }
