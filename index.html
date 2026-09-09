@@ -79,17 +79,21 @@
     const STREAM_JSON_URL = `${BASE_URL}stream.json`;
     const CALENDAR_JSON_URL = `${BASE_URL}calendar.json`;
 
-    function formattaData(dataStr) {
-      if (!dataStr) return '';
-      const [anno, mese, giorno] = dataStr.split('-');
-      const dataObj = new Date(anno, mese - 1, giorno);
-      return dataObj.toLocaleDateString('it-IT', {
-        weekday: 'capitalize',
-        day: 'numeric',
-        month: 'long',
-        year: 'numeric'
-      });
-    }
+function formattaData(dataStr) {
+  if (!dataStr) return '';
+  const [anno, mese, giorno] = dataStr.split('-');
+  const dataObj = new Date(anno, mese - 1, giorno);
+
+  const dataEstesa = dataObj.toLocaleDateString('it-IT', {
+    weekday: 'long',
+    day: 'numeric',
+    month: 'long',
+    year: 'numeric'
+  });
+
+  // Mette in maiuscolo la prima lettera (es. "Domenica 20 settembre 2026")
+  return dataEstesa.charAt(0).toUpperCase() + dataEstesa.slice(1);
+}
 
     async function checkMatch() {
       const app = document.getElementById('app');
