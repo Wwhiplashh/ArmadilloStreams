@@ -57,11 +57,11 @@ def fetch_inter_matches():
             "url": ""  # Rimane vuoto o da popolare se usi sempre URL fissi
         })
 
-    # Salva il risultato in calendario.json
-    with open("calendario.json", "w", encoding="utf-8") as f:
+    # Salva il risultato in calendar.json
+    with open("calendar.json", "w", encoding="utf-8") as f:
         json.dump(partite, f, indent=2, ensure_ascii=False)
 
-    print("Calendario generato con successo in calendario.json")
+    print("Calendario generato con successo in calendar.json")
 
 if __name__ == "__main__":
     fetch_inter_matches()
