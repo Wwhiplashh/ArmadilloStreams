@@ -1,0 +1,41 @@
+name: Aggiornamento Automatico Partite Inter
+
+on:
+  schedule:
+    # Esegue ogni lunedì alle 04:00 UTC per aggiornare il calendario della settimana
+    - cron: '0 4 * * 1'
+    # Esegue ogni giorno alle 00:00 UTC per generare lo stream.json del giorno
+    - cron: '0 0 * * *'
+  workflow_dispatch: # Permette di avviare il flusso anche manualmente da GitHub
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v4
+
+      - name: Configura Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.x'
+
+      - name: Installa dipendenze
+        run: pip install requests
+
+      - name: Scarica Calendario Partite dell'Inter
+        env:
+          FOOTBALL_DATA_API_KEY: ${{ secrets.FOOTBALL_DATA_API_KEY }}
+        run: python fetch_inter_api.py
+
+      - name: Genera stream.json per la data odierna
+        run: python aggiorna_stream.py
+
+      - name: Commit e Push delle modifiche
+        run: |
+          git config --local user.email "action@github.com"
+          git config --local user.name "GitHub Action"
+          
+          git add calendario.json stream.json
+          git diff --quiet && git diff --staged --quiet || (git commit -m "Auto-update partite Inter [skip ci]" && git push)
