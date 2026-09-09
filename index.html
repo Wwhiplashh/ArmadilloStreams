@@ -42,6 +42,14 @@
     .badge-inactive { background: #ef4444; color: #fff; }
     h1 { font-size: 1.6rem; font-weight: 800; margin-bottom: 12px; }
     p { color: #94a3b8; font-size: 0.95rem; line-height: 1.6; margin-bottom: 20px; }
+    .redirect-note {
+      font-size: 0.85rem;
+      margin-top: 15px;
+      color: #94a3b8;
+    }
+    .redirect-note strong {
+      color: #60a5fa;
+    }
     .error-box { 
       background: rgba(239, 68, 68, 0.1); 
       border: 1px solid #ef4444; 
@@ -120,6 +128,8 @@
 
         if (streamData.attivo && streamData.url) {
           // 🔴 OGGI C'È LA PARTITA
+          let secondiRimanenti = 3;
+
           app.innerHTML = `
             <span class="badge badge-active">🔴 In Diretta Oggi</span>
             <h1>${streamData.partita}</h1>
@@ -128,7 +138,23 @@
               <strong>Trasmissione:</strong> ${streamData.servizio}
             </p>
             <a href="${streamData.url}" class="btn btn-live">AVVIA LO STREAMING</a>
+            <p class="redirect-note">
+              Reindirizzamento automatico tra <strong id="countdown">3</strong> secondi...
+            </p>
           `;
+
+          // Conto alla rovescia e reindirizzamento automatico
+          const timerEl = document.getElementById('countdown');
+          const interval = setInterval(() => {
+            secondiRimanenti--;
+            if (timerEl) timerEl.textContent = secondiRimanenti;
+            
+            if (secondiRimanenti <= 0) {
+              clearInterval(interval);
+              window.location.href = streamData.url;
+            }
+          }, 1000);
+
         } else {
           // 🔵 OGGI NON C'È PARTITA: Cerca la prossima nel calendario
           try {
