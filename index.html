@@ -92,8 +92,9 @@
       const app = document.getElementById('app');
 
       try {
-        // 1. Controlla stream.json per la giornata odierna
+        // 1. Controlla stream.json
         const response = await fetch(STREAM_JSON_URL, { cache: 'no-store' });
+        if (!response.ok) throw new Error(`Errore fetch stream.json: ${response.status}`);
         const streamData = await response.json();
 
         if (streamData.attivo && streamData.url) {
@@ -108,15 +109,27 @@
             <a href="${streamData.url}" class="btn btn-live">AVVIA LO STREAMING</a>
           `;
         } else {
-          // 🔵 OGGI NON C'È PARTITA: Leggi il calendario per trovare il prossimo match
-          const dataOggi = streamData.data || new Date().toISOString().split('T')[0];
-          
+          // 🔵 OGGI NON C'È PARTITA: Cerca nel calendario
           try {
             const calResponse = await fetch(CALENDAR_JSON_URL, { cache: 'no-store' });
-            const calendario = await calResponse.json();
+            if (!calResponse.ok) throw new Error(`File calendario non trovato (${calResponse.status})`);
+            
+            const dataCal = await calResponse.json();
+            
+            // Gestisce sia il caso in cui il JSON sia un Array [...] sia un Oggetto { "partite": [...] }
+            const calendario = Array.isArray(dataCal) ? dataCal : (dataCal.partite || []);
 
-            // Cerca la prima partita con data strettamente futura
-            const prossimaPartita = calendario.find(p => p.data > dataOggi);
+            // Data di riferimento di oggi a mezzanotte
+            const oggi = new Date();
+            oggi.setHours(0, 0, 0, 0);
+
+            // Trova la prima partita con data maggiore o uguale a oggi
+            const prossimaPartita = calendario.find(p => {
+              if (!p.data) return false;
+              const dataPartita = new Date(p.data);
+              dataPartita.setHours(0, 0, 0, 0);
+              return dataPartita >= oggi;
+            });
 
             if (prossimaPartita) {
               const dataFormattata = formattaData(prossimaPartita.data);
@@ -132,7 +145,6 @@
                 <button disabled class="btn btn-disabled">Match Non Ancora Attivo</button>
               `;
             } else {
-              // Se la stagione è finita o il calendario non ha prossimi match
               app.innerHTML = `
                 <span class="badge badge-inactive">Nessun Evento</span>
                 <h1>Nessuna partita in programma</h1>
@@ -141,26 +153,26 @@
               `;
             }
           } catch (calErr) {
-            // Fallback se il file calendar.json non è raggiungibile
+            console.error("Errore caricamento calendario:", calErr);
             app.innerHTML = `
-              <span class="badge badge-inactive">Nessun Evento</span>
-              <h1>Oggi l'Inter non gioca 😴</h1>
-              <p>Nessuno stream attivo per la giornata odierna.</p>
+              <span class="badge badge-inactive">Errore Calendario</span>
+              <h1>Calendario non disponibile</h1>
+              <p>Impossibile recuperare la prossima partita (Verifica se il file si chiama calendar.json su GitHub).</p>
               <button disabled class="btn btn-disabled">Nessuno Stream Attivo</button>
             `;
           }
         }
       } catch (err) {
+        console.error("Errore principale:", err);
         app.innerHTML = `
           <span class="badge badge-inactive">Errore</span>
           <h1>Impossibile caricare i dati</h1>
-          <p>Verifica la connessione internet o riprova più tardi.</p>
+          <p>Verifica la connessione o l'URL del repository.</p>
         `;
       }
     }
 
     checkMatch();
   </script>
-
 </body>
 </html>
