@@ -42,3 +42,13 @@ def fetch_inter_matches():
 
 if __name__ == "__main__":
     fetch_inter_matches()
+
+def assegna_servizio(competizione, data):
+    if competizione == "Serie A":
+        return "DAZN"
+    elif competizione == "Coppa Italia":
+        return "Mediaset"
+    elif competizione == "UEFA Champions League":
+        # Esempio: le partite del mercoledì su Prime Video, le altre su Sky
+        return "Prime Video / Sky"
+    return "Generico"
