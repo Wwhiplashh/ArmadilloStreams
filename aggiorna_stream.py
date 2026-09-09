@@ -7,10 +7,10 @@ def genera_stream():
     
     # Carica il calendario delle partite
     try:
-        with open("calendario.json", "r", encoding="utf-8") as f:
+        with open("calendar.json", "r", encoding="utf-8") as f:
             calendario = json.load(f)
     except FileNotFoundError:
-        print("File calendario.json non trovato.")
+        print("File calendar.json non trovato.")
         return
 
     # Cerca la partita in programma per oggi
