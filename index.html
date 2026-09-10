@@ -4,6 +4,8 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Inter Stream Viewer</title>
+  <!-- Google Fonts per Armadillo Interactive -->
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700&display=swap" rel="stylesheet">
   <style>
     * { box-sizing: border-box; margin: 0; padding: 0; }
     body {
@@ -16,6 +18,52 @@
       align-items: center;
       padding: 20px;
     }
+
+    /* Schermata di Caricamento (Splash Screen) */
+    #splash-screen {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: linear-gradient(135deg, #020b18 0%, #081b3b 100%);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      z-index: 9999;
+      transition: opacity 0.6s ease, visibility 0.6s ease;
+    }
+    #splash-screen.fade-out {
+      opacity: 0;
+      visibility: hidden;
+    }
+    .splash-logo {
+      width: 90px;
+      height: 90px;
+      object-fit: contain;
+      margin-bottom: 20px;
+      animation: pulse 1.5s infinite ease-in-out;
+    }
+    .splash-title {
+      font-family: 'Poppins', sans-serif;
+      font-size: 1.8rem;
+      font-weight: 700;
+      color: #ffffff;
+      letter-spacing: 1px;
+    }
+    .splash-subtitle {
+      font-family: 'Poppins', sans-serif;
+      font-size: 0.9rem;
+      color: #94a3b8;
+      margin-top: 8px;
+    }
+    @keyframes pulse {
+      0% { transform: scale(1); opacity: 0.8; }
+      50% { transform: scale(1.08); opacity: 1; }
+      100% { transform: scale(1); opacity: 0.8; }
+    }
+
     .card {
       background: rgba(13, 27, 54, 0.85);
       border: 1px solid #1d4ed8;
@@ -85,6 +133,13 @@
 </head>
 <body>
 
+  <!-- Schermata di Caricamento (Splash Screen) -->
+  <div id="splash-screen">
+    <img src="logo.png" alt="Logo Armadillo" class="splash-logo">
+    <div class="splash-title">Armadillo Interactive</div>
+    <div class="splash-subtitle">Caricamento in corso...</div>
+  </div>
+
   <div class="card" id="app">
     <div class="badge badge-next">Verifica in corso...</div>
     <h1>Connessione al server...</h1>
@@ -116,6 +171,15 @@
       return dataEstesa.charAt(0).toUpperCase() + dataEstesa.slice(1);
     }
 
+    function hideSplash() {
+      const splash = document.getElementById('splash-screen');
+      if (splash && !splash.classList.contains('fade-out')) {
+        setTimeout(() => {
+          splash.classList.add('fade-out');
+        }, 600); // Piccolo ritardo fluido per godersi l'animazione del logo
+      }
+    }
+
     async function checkMatch() {
       const app = document.getElementById('app');
 
@@ -123,6 +187,8 @@
         const response = await fetch(STREAM_JSON_URL, { cache: 'no-store' });
         if (!response.ok) throw new Error(`HTTP ${response.status} caricando stream.json`);
         const streamData = await response.json();
+
+        hideSplash();
 
         if (streamData.attivo && streamData.url) {
           let secondiRimanenti = 3;
@@ -201,6 +267,7 @@
           }
         }
       } catch (err) {
+        hideSplash();
         app.innerHTML = `
           <span class="badge badge-inactive">Errore Stream</span>
           <h1>Impossibile caricare i dati dello stream</h1>
