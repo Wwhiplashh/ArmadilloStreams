@@ -44,25 +44,7 @@
       object-fit: contain;
       animation: logoScaleEntrance 2s cubic-bezier(0.25, 1, 0.5, 1) forwards;
     }
-    .splash-title {
-      font-family: 'Poppins', sans-serif;
-      font-size: 2rem;
-      font-weight: 700;
-      color: #ffffff;
-      letter-spacing: 1px;
-      margin-top: -180px;
-      animation: textEntrance 2s cubic-bezier(0.25, 1, 0.5, 1) forwards;
-      opacity: 0;
-    }
-    .splash-subtitle {
-      font-family: 'Poppins', sans-serif;
-      font-size: 0.95rem;
-      color: #94a3b8;
-      margin-top: 2px;
-      animation: textEntranceSub 2s cubic-bezier(0.25, 1, 0.5, 1) 0.1s forwards;
-      opacity: 0;
-    }
-
+   
     @keyframes logoScaleEntrance {
       0% {
         transform: scale(0.9);
@@ -168,8 +150,6 @@
   <!-- Schermata di Caricamento (Splash Screen) -->
   <div id="splash-screen">
     <img src="logo.png" alt="Logo Armadillo" class="splash-logo">
-    <div class="splash-title">Armadillo Interactive</div>
-    <div class="splash-subtitle">Caricamento in corso...</div>
   </div>
 
   <div class="card" id="app">
