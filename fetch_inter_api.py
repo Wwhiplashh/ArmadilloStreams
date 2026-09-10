@@ -3,7 +3,6 @@ import os
 from datetime import datetime
 import requests
 
-# Chiave diretta da API-SPORTS (dashboard.api-football.com)
 APISPORTS_KEY = os.getenv("APISPORTS_KEY")
 INTER_TEAM_ID = 505
 CURRENT_SEASON = 2026
@@ -25,25 +24,26 @@ def determina_servizio(competizione, data_dt):
 
 
 def fetch_inter_matches():
-  # URL ufficiale diretto di API-SPORTS
   url = "https://v3.football.api-sports.io/fixtures"
-
-  # Header ufficiale per API-SPORTS
   headers = {"x-apisports-key": APISPORTS_KEY}
-
   params = {"team": INTER_TEAM_ID, "season": CURRENT_SEASON}
 
   response = requests.get(url, headers=headers, params=params)
   if response.status_code != 200:
-    print(
-        "Errore nella chiamata API-Sports:"
-        f" {response.status_code} - {response.text}"
-    )
+    print(f"Errore HTTP: {response.status_code} - {response.text}")
     return
 
   data = response.json()
-  partite = []
 
+  # Stampa eventuali errori o avvisi restituiti nel JSON di API-SPORTS
+  errors = data.get("errors")
+  if errors:
+    print(f"⚠️ Avviso/Errore da API-SPORTS: {errors}")
+
+  results_count = data.get("results", 0)
+  print(f"Partite trovate dall'API: {results_count}")
+
+  partite = []
   for item in data.get("response", []):
     fix = item["fixture"]
     league = item["league"]
@@ -80,7 +80,7 @@ def fetch_inter_matches():
   with open("calendar.json", "w", encoding="utf-8") as f:
     json.dump(partite, f, indent=2, ensure_ascii=False)
 
-  print("Calendario generato con successo con loghi inclusi.")
+  print("Operazione completata.")
 
 
 if __name__ == "__main__":
