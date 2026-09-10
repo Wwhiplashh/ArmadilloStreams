@@ -10,11 +10,9 @@ DOMINI_STREAM = [
 ]
 
 # 2. MAPPA CANALI / PARAMETRI PER SERVIZIO
-# Associa ciascun servizio al percorso/ID del relativo player
 CANALI_SERVIZI = {
     "DAZN": "/watch.php?id=877",
     "Prime Video": "/watch.php?id=461",
-    "Mediaset": "/watch.php?id=893", #----- DA RISOLVERERE------
     "Sky / NOW": "/watch.php?id=461"
 }
 
@@ -27,7 +25,6 @@ def trova_dominio_base_attivo():
 
     for dominio in DOMINI_STREAM:
         try:
-            # Controllo veloce sul dominio base con timeout di 3 secondi
             response = requests.head(dominio, timeout=3, allow_redirects=True, headers=headers)
             if response.status_code < 400:
                 print(f"[OK] Dominio attivo trovato: {dominio}")
@@ -36,7 +33,6 @@ def trova_dominio_base_attivo():
             print(f"[FAIL] Dominio non raggiungibile: {dominio}")
             continue
 
-    # Fallback al primo se nessuno risponde
     return DOMINI_STREAM[0]
 
 # 4. LOGICA PRINCIPALE
@@ -59,19 +55,21 @@ def main():
 
     # Se c'è una partita oggi
     if partita_di_oggi:
-        servizio = partita_di_oggi.get("servizio")
+        servizio = partita_di_oggi.get("servizio", "")
         
-        # 1. Recupera il percorso del canale (es. /watch.php?id=891)
-        percorso_canale = CANALI_SERVIZI.get(servizio, "")
+        # Verifica automatica se la partita è su Mediaset (in chiaro)
+        in_chiaro = "mediaset" in servizio.lower()
         
-        # 2. Trova il primo dominio base funzionante
-        dominio_base = trova_dominio_base_attivo()
-        
-        # 3. Componi l'URL completo finale
-        url_finale = f"{dominio_base}{percorso_canale}" if percorso_canale else ""
+        if in_chiaro:
+            url_finale = ""
+        else:
+            percorso_canale = CANALI_SERVIZI.get(servizio, "")
+            dominio_base = trova_dominio_base_attivo()
+            url_finale = f"{dominio_base}{percorso_canale}" if percorso_canale else ""
 
         stream_data = {
             "attivo": True,
+            "in_chiaro": in_chiaro,
             "data": oggi,
             "partita": partita_di_oggi.get("partita"),
             "competizione": partita_di_oggi.get("competizione"),
@@ -82,6 +80,7 @@ def main():
         # Nessuna partita oggi
         stream_data = {
             "attivo": False,
+            "in_chiaro": False,
             "data": oggi,
             "partita": None,
             "competizione": None,
