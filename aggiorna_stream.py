@@ -2,44 +2,34 @@ import json
 from datetime import datetime
 import requests
 
-# 1. DOMINI BASE DA TESTARE (In ordine di preferenza)
 DOMINI_STREAM = [
     "https://dlhd.pk",
     "https://dlhd.st",
     "https://dstreams.st"
 ]
 
-# 2. MAPPA CANALI / PARAMETRI PER SERVIZIO
 CANALI_SERVIZI = {
     "DAZN": "/watch.php?id=877",
     "Prime Video": "/watch.php?id=461",
     "Sky / NOW": "/watch.php?id=461"
 }
 
-# 3. VERIFICA IL DOMINIO BASE FUNZIONANTE
 def trova_dominio_base_attivo():
-    """Testa i domini base e restituisce il primo raggiungibile."""
     headers = {
         'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36'
     }
-
     for dominio in DOMINI_STREAM:
         try:
             response = requests.head(dominio, timeout=3, allow_redirects=True, headers=headers)
             if response.status_code < 400:
-                print(f"[OK] Dominio attivo trovato: {dominio}")
                 return dominio
         except requests.RequestException:
-            print(f"[FAIL] Dominio non raggiungibile: {dominio}")
             continue
-
     return DOMINI_STREAM[0]
 
-# 4. LOGICA PRINCIPALE
 def main():
     oggi = datetime.now().strftime("%Y-%m-%d")
     
-    # Carica il calendario
     try:
         with open("calendar.json", "r", encoding="utf-8") as f:
             calendario = json.load(f)
@@ -53,11 +43,8 @@ def main():
             partita_di_oggi = evento
             break
 
-    # Se c'è una partita oggi
     if partita_di_oggi:
         servizio = partita_di_oggi.get("servizio", "")
-        
-        # Verifica automatica se la partita è su Mediaset (in chiaro)
         in_chiaro = "mediaset" in servizio.lower()
         
         if in_chiaro:
@@ -72,23 +59,27 @@ def main():
             "in_chiaro": in_chiaro,
             "data": oggi,
             "partita": partita_di_oggi.get("partita"),
+            "home_team": partita_di_oggi.get("home_team"),
+            "away_team": partita_di_oggi.get("away_team"),
+            "home_logo": partita_di_oggi.get("home_logo"),
+            "away_logo": partita_di_oggi.get("away_logo"),
             "competizione": partita_di_oggi.get("competizione"),
             "servizio": servizio,
             "url": url_finale
         }
     else:
-        # Nessuna partita oggi
         stream_data = {
             "attivo": False,
             "in_chiaro": False,
             "data": oggi,
             "partita": None,
+            "home_logo": None,
+            "away_logo": None,
             "competizione": None,
             "servizio": None,
             "url": ""
         }
 
-    # Salva il risultato in stream.json
     with open("stream.json", "w", encoding="utf-8") as f:
         json.dump(stream_data, f, indent=2, ensure_ascii=False)
     
