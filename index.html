@@ -44,7 +44,25 @@
       object-fit: contain;
       animation: logoScaleEntrance 2s cubic-bezier(0.25, 1, 0.5, 1) forwards;
     }
-   
+    .splash-title {
+      font-family: 'Poppins', sans-serif;
+      font-size: 2rem;
+      font-weight: 700;
+      color: #ffffff;
+      letter-spacing: 1px;
+      margin-top: -180px;
+      animation: textEntrance 2s cubic-bezier(0.25, 1, 0.5, 1) forwards;
+      opacity: 0;
+    }
+    .splash-subtitle {
+      font-family: 'Poppins', sans-serif;
+      font-size: 0.95rem;
+      color: #94a3b8;
+      margin-top: 2px;
+      animation: textEntranceSub 2s cubic-bezier(0.25, 1, 0.5, 1) 0.1s forwards;
+      opacity: 0;
+    }
+
     @keyframes logoScaleEntrance {
       0% {
         transform: scale(0.9);
@@ -112,6 +130,20 @@
     .redirect-note strong {
       color: #60a5fa;
     }
+    .countdown-box {
+      background: rgba(37, 99, 235, 0.1);
+      border: 1px solid #2563eb;
+      padding: 12px;
+      border-radius: 10px;
+      font-size: 0.9rem;
+      color: #94a3b8;
+      margin-top: 15px;
+    }
+    .countdown-box strong {
+      color: #60a5fa;
+      font-size: 1.05rem;
+      letter-spacing: 0.5px;
+    }
     .error-box { 
       background: rgba(239, 68, 68, 0.1); 
       border: 1px solid #ef4444; 
@@ -150,6 +182,8 @@
   <!-- Schermata di Caricamento (Splash Screen) -->
   <div id="splash-screen">
     <img src="logo.png" alt="Logo Armadillo" class="splash-logo">
+    <div class="splash-title">Armadillo Interactive</div>
+    <div class="splash-subtitle">Caricamento in corso...</div>
   </div>
 
   <div class="card" id="app">
@@ -186,7 +220,6 @@
     async function checkMatch() {
       const app = document.getElementById('app');
       const startTime = Date.now();
-      // 2s di animazione + 0.5s di pausa statica = 2500ms
       const minDisplayTime = 2500; 
 
       try {
@@ -210,7 +243,6 @@
             </p>
           `;
 
-          // Calcola il tempo rimanente per completare i 2.5 secondi prima di sbloccare la dissolvenza
           const elapsedTime = Date.now() - startTime;
           const remainingTime = Math.max(0, minDisplayTime - elapsedTime);
 
@@ -251,16 +283,52 @@
             if (prossimaPartita) {
               const dataFormattata = formattaData(prossimaPartita.data);
 
+              // Gestisce eventuale ora specifica nel json (es. p.ora = "20:45"), altrimenti imposta le 20:45 o la mezzanotte
+              const matchOra = prossimaPartita.ora || prossimaPartita.orario || "20:45";
+              const targetDate = new Date(`${prossimaPartita.data}T${matchOra}:00`);
+
               app.innerHTML = `
                 <span class="badge badge-next">Prossimo Match</span>
                 <h1>${prossimaPartita.partita}</h1>
                 <p>
-                  <strong>Data:</strong> ${dataFormattata}<br>
+                  <strong>Data:</strong> ${dataFormattata} (${matchOra})<br>
                   <strong>Competizione:</strong> ${prossimaPartita.competizione}<br>
                   <strong>Piattaforma:</strong> ${prossimaPartita.servizio}
                 </p>
-                <button disabled class="btn btn-disabled">Match Non Ancora Attivo</button>
+                <div class="countdown-box">
+                  Inizio tra:<br>
+                  <strong id="match-countdown">Calcolo in corso...</strong>
+                </div>
               `;
+
+              // Avvia il countdown in tempo reale
+              function aggiornaCountdown() {
+                const adesso = new Date();
+                const differenza = targetDate - adesso;
+
+                const countdownEl = document.getElementById('match-countdown');
+                if (!countdownEl) return;
+
+                if (differenza <= 0) {
+                  countdownEl.textContent = "Match in corso o appena iniziato!";
+                  return;
+                }
+
+                const giorni = Math.floor(differenza / (1000 * 60 * 60 * 24));
+                const ore = Math.floor((differenza % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+                const minuti = Math.floor((differenza % (1000 * 60 * 60)) / (1000 * 60));
+                const secondi = Math.floor((differenza % (1000 * 60)) / 1000);
+
+                let testo = "";
+                if (giorni > 0) testo += `${giorni}g `;
+                testo += `${ore}h ${minuti}m ${secondi}s`;
+
+                countdownEl.textContent = testo;
+              }
+
+              aggiornaCountdown();
+              setInterval(aggiornaCountdown, 1000);
+
             } else {
               app.innerHTML = `
                 <span class="badge badge-inactive">Nessun Evento</span>
