@@ -26,7 +26,7 @@ jobs:
       
       - name: Scarica Calendario Partite dell'Inter
         env:
-          APISPORTS_KEY: ${{ secrets.APISPORTS_KEY }}
+          RAPIDAPI_KEY: ${{ secrets.RAPIDAPI_KEY }}
         run: python fetch_inter_api.py
 
       - name: Genera stream.json per la data odierna
