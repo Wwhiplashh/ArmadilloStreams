@@ -3,7 +3,8 @@ import os
 from datetime import datetime
 import requests
 
-APISPORTS_KEY = os.getenv("APISPORTS_KEY")
+RAPIDAPI_KEY = os.getenv("RAPIDAPI_KEY")
+RAPIDAPI_HOST = "api-football-v1.p.rapidapi.com"
 INTER_TEAM_ID = 505
 CURRENT_SEASON = 2026
 
@@ -24,24 +25,42 @@ def determina_servizio(competizione, data_dt):
 
 
 def fetch_inter_matches():
-  url = "https://v3.football.api-sports.io/fixtures"
-  headers = {"x-apisports-key": APISPORTS_KEY}
+  # 1. Verifica se la variabile d'ambiente è presente
+  if not RAPIDAPI_KEY:
+    print(
+        "❌ Errore: la variabile RAPIDAPI_KEY non è impostata o è vuota nei"
+        " Secrets!"
+    )
+    return
+
+  url = "https://api-football-v1.p.rapidapi.com/v3/fixtures"
+  headers = {
+      "X-RapidAPI-Key": RAPIDAPI_KEY,
+      "X-RapidAPI-Host": RAPIDAPI_HOST,
+  }
   params = {"team": INTER_TEAM_ID, "season": CURRENT_SEASON}
 
-  response = requests.get(url, headers=headers, params=params)
+  # 2. Gestione errori di rete durante la richiesta
+  try:
+    response = requests.get(url, headers=headers, params=params, timeout=10)
+  except requests.RequestException as e:
+    print(f"❌ Errore di connessione/rete durante la chiamata API: {e}")
+    return
+
+  # 3. Controllo codice di stato HTTP
   if response.status_code != 200:
-    print(f"Errore HTTP: {response.status_code} - {response.text}")
+    print(f"❌ Errore HTTP {response.status_code}: {response.text}")
     return
 
   data = response.json()
 
-  # Stampa eventuali errori o avvisi restituiti nel JSON di API-SPORTS
+  # 4. Controllo errori/avvisi dentro il JSON di RapidAPI
   errors = data.get("errors")
   if errors:
-    print(f"⚠️ Avviso/Errore da API-SPORTS: {errors}")
+    print(f"⚠️ Dettaglio errore/avviso dall'API: {errors}")
 
   results_count = data.get("results", 0)
-  print(f"Partite trovate dall'API: {results_count}")
+  print(f"ℹ️ Partite trovate nell'API: {results_count}")
 
   partite = []
   for item in data.get("response", []):
@@ -80,7 +99,10 @@ def fetch_inter_matches():
   with open("calendar.json", "w", encoding="utf-8") as f:
     json.dump(partite, f, indent=2, ensure_ascii=False)
 
-  print("Operazione completata.")
+  print(
+      "✅ Operazione completata! Partite salvate in calendar.json:"
+      f" {len(partite)}"
+  )
 
 
 if __name__ == "__main__":
