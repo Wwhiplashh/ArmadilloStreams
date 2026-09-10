@@ -1,12 +1,11 @@
+from datetime import datetime
 import json
 import os
-from datetime import datetime
 import requests
 
 RAPIDAPI_KEY = os.getenv("RAPIDAPI_KEY")
-RAPIDAPI_HOST = "api-football-v1.p.rapidapi.com"
-INTER_TEAM_ID = 505
-CURRENT_SEASON = 2026
+RAPIDAPI_HOST = "sportapi7.p.rapidapi.com"
+INTER_TEAM_ID = 2697  # ID dell'Inter su SportAPI / Sofascore
 
 
 def determina_servizio(competizione, data_dt):
@@ -16,7 +15,7 @@ def determina_servizio(competizione, data_dt):
   elif "coppa italia" in comp_lower:
     return "Mediaset"
   elif "champions league" in comp_lower:
-    if data_dt.weekday() == 2:
+    if data_dt.weekday() == 2:  # Mercoledì
       return "Prime Video"
     return "Sky / NOW"
   elif "supercoppa" in comp_lower:
@@ -25,70 +24,73 @@ def determina_servizio(competizione, data_dt):
 
 
 def fetch_inter_matches():
-  # 1. Verifica se la variabile d'ambiente è presente
   if not RAPIDAPI_KEY:
-    print(
-        "❌ Errore: la variabile RAPIDAPI_KEY non è impostata o è vuota nei"
-        " Secrets!"
-    )
+    print("❌ Errore: la variabile RAPIDAPI_KEY non è impostata nei Secrets!")
     return
 
-  url = "https://api-football-v1.p.rapidapi.com/v3/fixtures"
+  # Endpoint per le prossime partite dell'Inter
+  url = (
+      f"https://sportapi7.p.rapidapi.com/api/v1/team/{INTER_TEAM_ID}/events/next/0"
+  )
   headers = {
       "X-RapidAPI-Key": RAPIDAPI_KEY,
       "X-RapidAPI-Host": RAPIDAPI_HOST,
   }
-  params = {"team": INTER_TEAM_ID, "season": CURRENT_SEASON}
 
-  # 2. Gestione errori di rete durante la richiesta
   try:
-    response = requests.get(url, headers=headers, params=params, timeout=10)
+    response = requests.get(url, headers=headers, timeout=10)
   except requests.RequestException as e:
-    print(f"❌ Errore di connessione/rete durante la chiamata API: {e}")
+    print(f"❌ Errore di connessione: {e}")
     return
 
-  # 3. Controllo codice di stato HTTP
   if response.status_code != 200:
     print(f"❌ Errore HTTP {response.status_code}: {response.text}")
     return
 
   data = response.json()
-
-  # 4. Controllo errori/avvisi dentro il JSON di RapidAPI
-  errors = data.get("errors")
-  if errors:
-    print(f"⚠️ Dettaglio errore/avviso dall'API: {errors}")
-
-  results_count = data.get("results", 0)
-  print(f"ℹ️ Partite trovate nell'API: {results_count}")
+  events = data.get("events", [])
+  print(f"ℹ️ Partite trovate: {len(events)}")
 
   partite = []
-  for item in data.get("response", []):
-    fix = item["fixture"]
-    league = item["league"]
-    home = item["teams"]["home"]
-    away = item["teams"]["away"]
+  for event in events:
+    tournament = event.get("tournament", {})
+    home = event.get("homeTeam", {})
+    away = event.get("awayTeam", {})
 
-    utc_date_str = fix["date"]
-    try:
-      data_dt = datetime.fromisoformat(utc_date_str.replace("Z", "+00:00"))
-    except ValueError:
-      data_dt = datetime.strptime(utc_date_str[:19], "%Y-%m-%dT%H:%M:%S")
+    # Data e ora a partire dallo timestamp Unix
+    timestamp = event.get("startTimestamp")
+    if not timestamp:
+      continue
 
+    data_dt = datetime.fromtimestamp(timestamp)
     data_str = data_dt.strftime("%Y-%m-%d")
     ora_str = data_dt.strftime("%H:%M")
 
-    competition = league["name"]
+    competition = tournament.get("name", "Competizione sconosciuta")
     servizio_tv = determina_servizio(competition, data_dt)
+
+    # Costruzione URL dei loghi squadra
+    home_id = home.get("id")
+    away_id = away.get("id")
+    home_logo = (
+        f"https://api.sofascore.app/api/v1/team/{home_id}/image"
+        if home_id
+        else ""
+    )
+    away_logo = (
+        f"https://api.sofascore.app/api/v1/team/{away_id}/image"
+        if away_id
+        else ""
+    )
 
     partite.append({
         "data": data_str,
         "ora": ora_str,
-        "partita": f"{home['name']} vs {away['name']}",
-        "home_team": home["name"],
-        "away_team": away["name"],
-        "home_logo": home["logo"],
-        "away_logo": away["logo"],
+        "partita": f"{home.get('name', '')} vs {away.get('name', '')}",
+        "home_team": home.get("name", ""),
+        "away_team": away.get("name", ""),
+        "home_logo": home_logo,
+        "away_logo": away_logo,
         "competizione": competition,
         "servizio": servizio_tv,
         "url": "",
@@ -99,10 +101,7 @@ def fetch_inter_matches():
   with open("calendar.json", "w", encoding="utf-8") as f:
     json.dump(partite, f, indent=2, ensure_ascii=False)
 
-  print(
-      "✅ Operazione completata! Partite salvate in calendar.json:"
-      f" {len(partite)}"
-  )
+  print(f"✅ Completato con successo! Generate {len(partite)} partite.")
 
 
 if __name__ == "__main__":
