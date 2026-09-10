@@ -23,10 +23,10 @@ jobs:
           
       - name: Installa dipendenze
         run: pip install requests
-
+      
       - name: Scarica Calendario Partite dell'Inter
         env:
-          RAPIDAPI_KEY: ${{ secrets.RAPIDAPI_KEY }}
+          APISPORTS_KEY: ${{ secrets.APISPORTS_KEY }}
         run: python fetch_inter_api.py
 
       - name: Genera stream.json per la data odierna
