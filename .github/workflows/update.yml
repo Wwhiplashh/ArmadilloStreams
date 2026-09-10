@@ -24,9 +24,9 @@ jobs:
       - name: Installa dipendenze
         run: pip install requests
 
-      - name: Scarica Calendario Partite dell'Inter
+- name: Scarica Calendario Partite dell'Inter
         env:
-          FOOTBALL_DATA_API_KEY: ${{ secrets.FOOTBALL_DATA_API_KEY }}
+          RAPIDAPI_KEY: ${{ secrets.RAPIDAPI_KEY }}
         run: python fetch_inter_api.py
 
       - name: Genera stream.json per la data odierna
