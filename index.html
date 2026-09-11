@@ -200,21 +200,6 @@
     const STREAM_JSON_URL = `${BASE_URL}stream.json`;
     const CALENDAR_JSON_URL = `${BASE_URL}calendar.json`;
 
-    function formattaData(dataStr) {
-      if (!dataStr) return '';
-      const [anno, mese, giorno] = dataStr.split('-');
-      const dataObj = new Date(anno, mese - 1, giorno);
-
-      const dataEstesa = dataObj.toLocaleDateString('it-IT', {
-        weekday: 'long',
-        day: 'numeric',
-        month: 'long',
-        year: 'numeric'
-      });
-
-      return dataEstesa.charAt(0).toUpperCase() + dataEstesa.slice(1);
-    }
-
     async function checkMatch() {
       const app = document.getElementById('app');
       const startTime = Date.now();
@@ -268,28 +253,45 @@
             const dataCal = await calResponse.json();
             const calendario = Array.isArray(dataCal) ? dataCal : (dataCal.partite || []);
 
-            const oggi = new Date();
-            oggi.setHours(0, 0, 0, 0);
+            const adesso = new Date();
 
             const prossimaPartita = calendario.find(p => {
               if (!p.data) return false;
-              const dataPartita = new Date(p.data);
-              dataPartita.setHours(0, 0, 0, 0);
-              return dataPartita >= oggi;
+              const matchOraUtc = p.ora || p.orario || "18:45";
+              const targetDate = new Date(`${p.data}T${matchOraUtc}:00Z`);
+              
+              // Mantiene la partita valida se l'orario di inizio è futuro o non è passato da più di 2 ore
+              return targetDate >= (adesso - 2 * 60 * 60 * 1000);
             });
 
             if (prossimaPartita) {
-              const dataFormattata = formattaData(prossimaPartita.data);
+              const matchOraUtc = prossimaPartita.ora || prossimaPartita.orario || "18:45";
+              
+              // Creiamo l'oggetto Date specificando UTC ('Z')
+              const targetDate = new Date(`${prossimaPartita.data}T${matchOraUtc}:00Z`);
 
-              // Gestisce eventuale ora specifica nel json (es. p.ora = "20:45"), altrimenti imposta le 20:45 o la mezzanotte
-              const matchOra = prossimaPartita.ora || prossimaPartita.orario || "20:45";
-              const targetDate = new Date(`${prossimaPartita.data}T${matchOra}:00`);
+              // Formattiamo la data basandoci sul fuso italiano 'Europe/Rome'
+              const dataRaw = targetDate.toLocaleDateString('it-IT', {
+                timeZone: 'Europe/Rome',
+                weekday: 'long',
+                day: 'numeric',
+                month: 'long',
+                year: 'numeric'
+              });
+              const dataFormattata = dataRaw.charAt(0).toUpperCase() + dataRaw.slice(1);
+
+              // Formattiamo l'ora convertita nel fuso italiano (es. 18:45 UTC -> 20:45 CEST)
+              const oraItaliana = targetDate.toLocaleTimeString('it-IT', {
+                timeZone: 'Europe/Rome',
+                hour: '2-digit',
+                minute: '2-digit'
+              });
 
               app.innerHTML = `
                 <span class="badge badge-next">Prossimo Match</span>
                 <h1>${prossimaPartita.partita}</h1>
                 <p>
-                  <strong>Data:</strong> ${dataFormattata} (${matchOra})<br>
+                  <strong>Data:</strong> ${dataFormattata} (${oraItaliana})<br>
                   <strong>Competizione:</strong> ${prossimaPartita.competizione}<br>
                   <strong>Piattaforma:</strong> ${prossimaPartita.servizio}
                 </p>
@@ -301,8 +303,8 @@
 
               // Avvia il countdown in tempo reale
               function aggiornaCountdown() {
-                const adesso = new Date();
-                const differenza = targetDate - adesso;
+                const adessoOra = new Date();
+                const differenza = targetDate - adessoOra;
 
                 const countdownEl = document.getElementById('match-countdown');
                 if (!countdownEl) return;
