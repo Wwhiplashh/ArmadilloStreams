@@ -1,0 +1,12 @@
+{
+  "name": "Armadillo Streams",
+  "short_name": "Armadillo",
+  "start_url": "./",
+  "display": "standalone",
+  "icons": [
+    {
+      "src": "armadillo.png",
+      "sizes": "192x192",
+      "type": "image/png"
+    }
+  ]
