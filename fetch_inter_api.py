@@ -17,7 +17,7 @@ def determina_servizio(competizione, data_dt):
   elif "champions league" in comp_lower:
     if data_dt.weekday() == 2:  # Mercoledì
       return "Prime Video"
-    return "Sky / NOW"
+    return "Sky Sport Uno"
   elif "supercoppa" in comp_lower:
     return "Mediaset"
   return "Generico"
