@@ -200,7 +200,7 @@
     </div>
   </div>
 
-  <script>
+<script>
     const REPO_USER = 'Wwhiplashh';
     const REPO_NAME = 'ArmadilloStreams';
 
@@ -253,12 +253,10 @@
                 </div>
               </div>
             `;
-            return;
+            return { attivo: false };
           }
 
           if (streamData.url) {
-            let secondiRimanenti = 3;
-
             app.innerHTML = `
               <div>
                 <span class="badge badge-active">🔴 In Diretta Oggi</span>
@@ -267,25 +265,18 @@
                   <strong>Competizione:</strong> ${streamData.competizione || '-'}<br>
                   <strong>Trasmissione:</strong> ${streamData.servizio || '-'}
                 </p>
-                <a href="${streamData.url}" class="btn btn-live">AVVIA LO STREAMING</a>
-                <p class="redirect-note">
+                <a href="${streamData.url}" target="_blank" class="btn btn-live">AVVIA LO STREAMING</a>
+                <p class="redirect-note" id="${countdownPrefix}-note">
                   Reindirizzamento automatico tra <strong id="${countdownPrefix}-cd">3</strong> secondi...
                 </p>
               </div>
             `;
 
-            const timerEl = document.getElementById(`${countdownPrefix}-cd`);
-            const interval = setInterval(() => {
-              secondiRimanenti--;
-              if (timerEl) timerEl.textContent = secondiRimanenti;
-              
-              if (secondiRimanenti <= 0) {
-                clearInterval(interval);
-                window.location.href = streamData.url;
-              }
-            }, 1000);
-
-            return;
+            return { 
+              attivo: true, 
+              url: streamData.url, 
+              countdownPrefix 
+            };
           }
         }
 
@@ -419,13 +410,15 @@
           </div>
         `;
       }
+
+      return { attivo: false };
     }
 
     async function init() {
       const startTime = Date.now();
 
-      // Carica contemporaneamente i dati dell'Inter e della Formula 1
-      await Promise.allSettled([
+      // Carica contemporaneamente i dati di Inter e F1
+      const results = await Promise.allSettled([
         loadEventCard({
           elementId: 'app-inter',
           streamUrl: `${BASE_URL}stream.json`,
@@ -443,6 +436,37 @@
       ]);
 
       hideSplashScreen(startTime);
+
+      // Filtra gli eventi che risultano in diretta adesso
+      const activeStreams = results
+        .filter(r => r.status === 'fulfilled' && r.value && r.value.attivo)
+        .map(r => r.value);
+
+      // CASO A: 2 Stream attivi contemporaneamente -> disabilita il redirect automatico e avvisa l'utente
+      if (activeStreams.length > 1) {
+        activeStreams.forEach(s => {
+          const noteEl = document.getElementById(`${s.countdownPrefix}-note`);
+          if (noteEl) {
+            noteEl.innerHTML = `⚠️ <strong>Due eventi in diretta!</strong> Seleziona manualmente lo streaming da avviare.`;
+          }
+        });
+      } 
+      // CASO B: Soltanto 1 Stream attivo -> esegui il reindirizzamento automatico
+      else if (activeStreams.length === 1) {
+        const stream = activeStreams[0];
+        let secondiRimanenti = 3;
+
+        const timerEl = document.getElementById(`${stream.countdownPrefix}-cd`);
+        const interval = setInterval(() => {
+          secondiRimanenti--;
+          if (timerEl) timerEl.textContent = secondiRimanenti;
+          
+          if (secondiRimanenti <= 0) {
+            clearInterval(interval);
+            window.location.href = stream.url;
+          }
+        }, 1000);
+      }
     }
 
     init();
