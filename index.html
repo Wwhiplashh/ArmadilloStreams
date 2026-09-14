@@ -5,18 +5,20 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Armadillo Streams</title>
 
-  <!-- Favicon e Icone -->
+  <!-- Favicon e Icone per Barra delle Applicazioni (Brave / Chromium) -->
   <link rel="icon" type="image/x-icon" href="armadillo.ico">
   <link rel="icon" type="image/png" sizes="192x192" href="armadillo.png">
   <link rel="apple-touch-icon" sizes="180x180" href="armadillo.png">
+  
+  <!-- Web App Manifest per forzare il nome e l'icona su Brave -->
   <link rel="manifest" href="manifest.json">
 
-  <!-- Google Fonts -->
+  <!-- Google Fonts per Armadillo Interactive -->
   <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700&display=swap" rel="stylesheet">
   <style>
     * { box-sizing: border-box; margin: 0; padding: 0; }
     body {
-      font-family: 'Poppins', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
       background: linear-gradient(135deg, #020b18 0%, #081b3b 100%);
       color: #ffffff;
       min-height: 100vh;
@@ -26,113 +28,131 @@
       padding: 20px;
     }
 
-    /* Splash Screen */
+    /* Schermata di Caricamento (Splash Screen) */
     #splash-screen {
       position: fixed;
-      top: 0; left: 0;
-      width: 100%; height: 100%;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
       background: linear-gradient(135deg, #020b18 0%, #081b3b 100%);
       display: flex;
+      flex-direction: column;
       align-items: center;
       justify-content: center;
       z-index: 9999;
-      transition: opacity 0.5s ease, visibility 0.5s ease;
+      transition: opacity 1s ease, visibility 1s ease;
     }
     #splash-screen.fade-out {
       opacity: 0;
       visibility: hidden;
-      pointer-events: none;
     }
     .splash-logo {
-      width: 320px;
-      max-width: 80vw;
-      height: auto;
+      width: 650px;
+      height: 650px;
       object-fit: contain;
+      animation: logoScaleEntrance 2s cubic-bezier(0.25, 1, 0.5, 1) forwards;
+    }
+    .splash-title {
+      font-family: 'Poppins', sans-serif;
+      font-size: 2rem;
+      font-weight: 700;
+      color: #ffffff;
+      letter-spacing: 1px;
+      margin-top: -180px;
+      animation: textEntrance 2s cubic-bezier(0.25, 1, 0.5, 1) forwards;
+      opacity: 0;
+    }
+    .splash-subtitle {
+      font-family: 'Poppins', sans-serif;
+      font-size: 0.95rem;
+      color: #94a3b8;
+      margin-top: 2px;
+      animation: textEntranceSub 2s cubic-bezier(0.25, 1, 0.5, 1) 0.1s forwards;
+      opacity: 0;
     }
 
-    .container {
-      width: 100%;
-      max-width: 900px;
-      margin: 0 auto;
+    @keyframes logoScaleEntrance {
+      0% {
+        transform: scale(0.9);
+        opacity: 0;
+      }
+      100% {
+        transform: scale(1.05);
+        opacity: 1;
+      }
     }
 
-    /* Evento in diretta / Overlay Banner */
-    .hero-card {
-      background: rgba(13, 27, 54, 0.9);
-      border: 1px solid #1d4ed8;
-      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
-      border-radius: 16px;
-      padding: 30px;
-      text-align: center;
-      backdrop-filter: blur(10px);
-      margin-bottom: 25px;
+    @keyframes textEntrance {
+      0% {
+        transform: translateY(15px);
+        opacity: 0;
+      }
+      100% {
+        transform: translateY(-10px);
+        opacity: 1;
+      }
     }
 
-    /* Griglia per i due eventi futuri (Inter e F1) */
-    .events-grid {
-      display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
-      gap: 20px;
-      width: 100%;
+    @keyframes textEntranceSub {
+      0% {
+        transform: translateY(15px);
+        opacity: 0;
+      }
+      100% {
+        transform: translateY(-10px);
+        opacity: 1;
+      }
     }
 
     .card {
       background: rgba(13, 27, 54, 0.85);
-      border: 1px solid rgba(29, 78, 216, 0.6);
-      box-shadow: 0 8px 24px rgba(0, 0, 0, 0.4);
+      border: 1px solid #1d4ed8;
+      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
       border-radius: 16px;
-      padding: 25px;
+      padding: 35px;
+      max-width: 480px;
+      width: 100%;
       text-align: center;
       backdrop-filter: blur(10px);
-      display: flex;
-      flex-direction: column;
-      justify-content: space-between;
     }
-
     .badge {
       display: inline-block;
-      padding: 5px 12px;
+      padding: 6px 14px;
       border-radius: 20px;
-      font-size: 0.8rem;
+      font-size: 0.85rem;
       font-weight: 700;
       text-transform: uppercase;
-      margin-bottom: 15px;
+      margin-bottom: 20px;
       letter-spacing: 0.5px;
-      align-self: center;
     }
     .badge-active { background: #16a34a; color: #fff; }
     .badge-next { background: #2563eb; color: #fff; }
-    .badge-inactive { background: #64748b; color: #fff; }
-    .badge-overlap { background: #eab308; color: #000; }
-    
-    h1 { font-size: 1.5rem; font-weight: 700; margin-bottom: 10px; }
-    h2 { font-size: 1.3rem; font-weight: 700; margin-bottom: 10px; }
-    p { color: #94a3b8; font-size: 0.9rem; line-height: 1.5; margin-bottom: 15px; }
-    
+    .badge-inactive { background: #ef4444; color: #fff; }
+    h1 { font-size: 1.6rem; font-weight: 800; margin-bottom: 12px; }
+    p { color: #94a3b8; font-size: 0.95rem; line-height: 1.6; margin-bottom: 20px; }
     .redirect-note {
       font-size: 0.85rem;
       margin-top: 15px;
       color: #94a3b8;
     }
-    .redirect-note strong { color: #60a5fa; }
-    
+    .redirect-note strong {
+      color: #60a5fa;
+    }
     .countdown-box {
       background: rgba(37, 99, 235, 0.1);
-      border: 1px solid rgba(37, 99, 235, 0.4);
+      border: 1px solid #2563eb;
       padding: 12px;
       border-radius: 10px;
-      font-size: 0.85rem;
+      font-size: 0.9rem;
       color: #94a3b8;
-      margin-top: 10px;
+      margin-top: 15px;
     }
     .countdown-box strong {
       color: #60a5fa;
       font-size: 1.05rem;
       letter-spacing: 0.5px;
-      display: block;
-      margin-top: 4px;
     }
-
     .error-box { 
       background: rgba(239, 68, 68, 0.1); 
       border: 1px solid #ef4444; 
@@ -143,47 +163,39 @@
       color: #fca5a5; 
       margin-top: 10px; 
       text-align: left; 
-    }
-    
-    .btn-container {
-      display: flex;
-      flex-direction: column;
-      gap: 10px;
-      margin-top: 15px;
+      word-break: break-all; 
     }
     .btn {
       display: block;
       width: 100%;
-      padding: 12px 18px;
+      padding: 14px 20px;
       border-radius: 10px;
-      font-size: 0.95rem;
+      font-size: 1rem;
       font-weight: 700;
       text-decoration: none;
       transition: all 0.2s ease;
       border: none;
       cursor: pointer;
-      text-align: center;
     }
-    .btn-live { background: #16a34a; color: #ffffff; box-shadow: 0 4px 14px rgba(22, 163, 74, 0.4); }
-    .btn-live:hover { background: #15803d; }
-    .btn-inter { background: #0284c7; color: #ffffff; box-shadow: 0 4px 14px rgba(2, 132, 199, 0.4); }
-    .btn-inter:hover { background: #0369a1; }
-    .btn-f1 { background: #dc2626; color: #ffffff; box-shadow: 0 4px 14px rgba(220, 38, 38, 0.4); }
-    .btn-f1:hover { background: #b91c1c; }
+    .btn-live { 
+      background: #16a34a; 
+      color: #ffffff; 
+      box-shadow: 0 4px 14px rgba(22, 163, 74, 0.4); 
+    }
+    .btn-live:hover { background: #15803d; transform: translateY(-1px); }
+    .btn-disabled { background: #1e293b; color: #64748b; cursor: not-allowed; }
   </style>
 </head>
 <body>
 
-  <!-- Splash Screen -->
+  <!-- Schermata di Caricamento (Splash Screen) -->
   <div id="splash-screen">
-    <img src="logo.png" alt="Logo Armadillo" class="splash-logo" onerror="this.src='armadillo.png'">
+    <img src="logo.png" alt="Logo Armadillo" class="splash-logo">
   </div>
 
-  <div class="container" id="app">
-    <div class="hero-card">
-      <span class="badge badge-next">Verifica in corso...</span>
-      <h1>Connessione al server...</h1>
-    </div>
+  <div class="card" id="app">
+    <div class="badge badge-next">Verifica in corso...</div>
+    <h1>Connessione al server...</h1>
   </div>
 
   <script>
@@ -196,288 +208,180 @@
 
     const STREAM_JSON_URL = `${BASE_URL}stream.json`;
     const CALENDAR_JSON_URL = `${BASE_URL}calendar.json`;
-    const F1_CALENDAR_JSON_URL = `${BASE_URL}f1_calendar.json`;
 
-    function nascondiSplash() {
-      setTimeout(() => {
-        const splash = document.getElementById('splash-screen');
-        if (splash) splash.classList.add('fade-out');
-      }, 300);
-    }
-
-    // Converte data e ora in oggetto Date UTC valido
-    function parseUTCDate(dataStr, oraStr) {
-      if (!dataStr) return null;
-      
-      let cleanData = String(dataStr).trim();
-      if (cleanData.includes('/')) {
-        const parts = cleanData.split('/');
-        if (parts.length === 3) {
-          cleanData = `${parts[2]}-${parts[1].padStart(2, '0')}-${parts[0].padStart(2, '0')}`;
-        }
-      }
-
-      let cleanOra = oraStr ? String(oraStr).trim().replace("Z", "") : "14:00";
-      const oraParts = cleanOra.split(':');
-      const hh = oraParts[0] ? oraParts[0].padStart(2, '0') : "14";
-      const mm = oraParts[1] ? oraParts[1].padStart(2, '0') : "00";
-
-      const isoString = `${cleanData}T${hh}:${mm}:00Z`;
-      const dateObj = new Date(isoString);
-      
-      return isNaN(dateObj.getTime()) ? null : dateObj;
-    }
-
-    // Verifica se l'evento è attivo E siamo nella finestra temporale corretta (ultimi 5 min o in corso)
-    function isEventoLive(evento) {
-      if (!evento || !evento.attivo || !evento.url || evento.in_chiaro) return false;
-      
-      if (evento.data && evento.ora) {
-        const matchTime = parseUTCDate(evento.data, evento.ora);
-        if (matchTime) {
-          const adesso = new Date();
-          const cinqueMinutiInMs = 5 * 60 * 1000;
-          const orarioAttivazione = matchTime.getTime() - cinqueMinutiInMs;
-          
-          // Ritorna true solo se mancano 5 minuti o meno all'inizio (o se l'evento è già iniziato)
-          return adesso.getTime() >= orarioAttivazione;
-        }
-      }
-      return false;
-    }
-
-    function trovaProssimoEvento(lista, tipo) {
-      const adesso = new Date();
-      let prossimo = null;
-      let minDiff = Infinity;
-
-      if (!Array.isArray(lista)) return null;
-
-      lista.forEach(ev => {
-        const dateObj = parseUTCDate(ev.data || ev.date, ev.ora || ev.orario || ev.time);
-        if (!dateObj) return;
-
-        const diff = dateObj - adesso;
-        
-        // Evento futuro oppure iniziato da meno di 3 ore
-        if (diff > -3 * 60 * 60 * 1000 && diff < minDiff) {
-          minDiff = diff;
-          prossimo = { ...ev, targetDate: dateObj, tipo };
-        }
-      });
-
-      return prossimo;
-    }
-
-    async function initApp() {
+    async function checkMatch() {
       const app = document.getElementById('app');
+      const startTime = Date.now();
+      const minDisplayTime = 2500; 
 
       try {
-        const [streamRes, calRes, f1CalRes] = await Promise.allSettled([
-          fetch(STREAM_JSON_URL, { cache: 'no-store' }),
-          fetch(CALENDAR_JSON_URL, { cache: 'no-store' }),
-          fetch(F1_CALENDAR_JSON_URL, { cache: 'no-store' })
-        ]);
+        const response = await fetch(STREAM_JSON_URL, { cache: 'no-store' });
+        if (!response.ok) throw new Error(`HTTP ${response.status} caricando stream.json`);
+        const streamData = await response.json();
 
-        let streamData = {};
-        if (streamRes.status === 'fulfilled' && streamRes.value.ok) {
-          streamData = await streamRes.value.json();
-        }
-
-        let calendarioInter = [];
-        if (calRes.status === 'fulfilled' && calRes.value.ok) {
-          const data = await calRes.value.json();
-          calendarioInter = Array.isArray(data) ? data : (data.partite || data.eventi || []);
-        }
-
-        let calendarioF1 = [];
-        if (f1CalRes.status === 'fulfilled' && f1CalRes.value.ok) {
-          const dataF1 = await f1CalRes.value.json();
-          calendarioF1 = Array.isArray(dataF1) ? dataF1 : (dataF1.gare || dataF1.races || dataF1.partite || dataF1.eventi || []);
-        }
-
-        const eventoInter = streamData.inter || (streamData.partita ? streamData : null);
-        const eventoF1 = streamData.f1 || null;
-
-        const interLive = isEventoLive(eventoInter);
-        const f1Live = isEventoLive(eventoF1);
-
-        // CASO 1: CONCOMITANZA (Sia Inter che F1 in diretta effettiva)
-        if (interLive && f1Live) {
-          app.innerHTML = `
-            <div class="hero-card">
-              <span class="badge badge-overlap">⚠️ Sovrapposizione Eventi</span>
-              <h1>Due eventi in diretta simultanea</h1>
-              <p>Seleziona lo streaming che desideri guardare:</p>
-              <div class="btn-container">
-                <a href="${eventoInter.url}" class="btn btn-inter">⚽ INTER: ${eventoInter.partita || 'Partita Inter'}</a>
-                <a href="${eventoF1.url}" class="btn btn-f1">🏎️ F1: ${eventoF1.partita || eventoF1.gara || eventoF1.gp || 'Gara F1'}</a>
-              </div>
-            </div>
-          `;
-          return;
-        }
-
-        // CASO 2: UN SOLO EVENTO IN DIRETTA EFFETTIVA
-        const eventoAttivo = interLive ? eventoInter : (f1Live ? eventoF1 : null);
-        const tipoEvento = interLive ? "⚽ Inter" : "🏎️ Formula 1";
-
-        if (eventoAttivo) {
+        if (streamData.attivo && streamData.url) {
           let secondiRimanenti = 3;
-          const titolo = eventoAttivo.partita || eventoAttivo.gara || eventoAttivo.gp || 'Evento in Diretta';
 
           app.innerHTML = `
-            <div class="hero-card">
-              <span class="badge badge-active">🔴 ${tipoEvento} In Diretta</span>
-              <h1>${titolo}</h1>
-              <p>
-                <strong>Competizione:</strong> ${eventoAttivo.competizione || (interLive ? 'Serie A' : 'Formula 1')}<br>
-                <strong>Piattaforma:</strong> ${eventoAttivo.servizio || 'Streaming'}
-              </p>
-              <a href="${eventoAttivo.url}" class="btn btn-live">AVVIA STREAMING</a>
-              <p class="redirect-note">
-                Reindirizzamento automatico tra <strong id="countdown">3</strong> secondi...
-              </p>
-            </div>
+            <span class="badge badge-active">🔴 In Diretta Oggi</span>
+            <h1>${streamData.partita}</h1>
+            <p>
+              <strong>Competizione:</strong> ${streamData.competizione}<br>
+              <strong>Trasmissione:</strong> ${streamData.servizio}
+            </p>
+            <a href="${streamData.url}" class="btn btn-live">AVVIA LO STREAMING</a>
+            <p class="redirect-note">
+              Reindirizzamento automatico tra <strong id="countdown">3</strong> secondi...
+            </p>
           `;
+
+          const elapsedTime = Date.now() - startTime;
+          const remainingTime = Math.max(0, minDisplayTime - elapsedTime);
+
+          setTimeout(() => {
+            const splash = document.getElementById('splash-screen');
+            if (splash) splash.classList.add('fade-out');
+          }, remainingTime);
 
           const timerEl = document.getElementById('countdown');
           const interval = setInterval(() => {
             secondiRimanenti--;
             if (timerEl) timerEl.textContent = secondiRimanenti;
+            
             if (secondiRimanenti <= 0) {
               clearInterval(interval);
-              window.location.href = eventoAttivo.url;
+              window.location.href = streamData.url;
             }
           }, 1000);
-          return;
+
+        } else {
+          try {
+            const calResponse = await fetch(CALENDAR_JSON_URL, { cache: 'no-store' });
+            if (!calResponse.ok) throw new Error(`HTTP ${calResponse.status} caricando calendar.json`);
+            
+            const dataCal = await calResponse.json();
+            const calendario = Array.isArray(dataCal) ? dataCal : (dataCal.partite || []);
+
+            const adesso = new Date();
+
+            const prossimaPartita = calendario.find(p => {
+              if (!p.data) return false;
+              const matchOraUtc = p.ora || p.orario || "18:45";
+              const targetDate = new Date(`${p.data}T${matchOraUtc}:00Z`);
+              
+              // Mantiene la partita valida se l'orario di inizio è futuro o non è passato da più di 2 ore
+              return targetDate >= (adesso - 2 * 60 * 60 * 1000);
+            });
+
+            if (prossimaPartita) {
+              const matchOraUtc = prossimaPartita.ora || prossimaPartita.orario || "18:45";
+              
+              // Creiamo l'oggetto Date specificando UTC ('Z')
+              const targetDate = new Date(`${prossimaPartita.data}T${matchOraUtc}:00Z`);
+
+              // Formattiamo la data basandoci sul fuso italiano 'Europe/Rome'
+              const dataRaw = targetDate.toLocaleDateString('it-IT', {
+                timeZone: 'Europe/Rome',
+                weekday: 'long',
+                day: 'numeric',
+                month: 'long',
+                year: 'numeric'
+              });
+              const dataFormattata = dataRaw.charAt(0).toUpperCase() + dataRaw.slice(1);
+
+              // Formattiamo l'ora convertita nel fuso italiano (es. 18:45 UTC -> 20:45 CEST)
+              const oraItaliana = targetDate.toLocaleTimeString('it-IT', {
+                timeZone: 'Europe/Rome',
+                hour: '2-digit',
+                minute: '2-digit'
+              });
+
+              app.innerHTML = `
+                <span class="badge badge-next">Prossimo Match</span>
+                <h1>${prossimaPartita.partita}</h1>
+                <p>
+                  <strong>Data:</strong> ${dataFormattata} (${oraItaliana})<br>
+                  <strong>Competizione:</strong> ${prossimaPartita.competizione}<br>
+                  <strong>Piattaforma:</strong> ${prossimaPartita.servizio}
+                </p>
+                <div class="countdown-box">
+                  Inizio tra:<br>
+                  <strong id="match-countdown">Calcolo in corso...</strong>
+                </div>
+              `;
+
+              // Avvia il countdown in tempo reale
+              function aggiornaCountdown() {
+                const adessoOra = new Date();
+                const differenza = targetDate - adessoOra;
+
+                const countdownEl = document.getElementById('match-countdown');
+                if (!countdownEl) return;
+
+                if (differenza <= 0) {
+                  countdownEl.textContent = "Match in corso o appena iniziato!";
+                  return;
+                }
+
+                const giorni = Math.floor(differenza / (1000 * 60 * 60 * 24));
+                const ore = Math.floor((differenza % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+                const minuti = Math.floor((differenza % (1000 * 60 * 60)) / (1000 * 60));
+                const secondi = Math.floor((differenza % (1000 * 60)) / 1000);
+
+                let testo = "";
+                if (giorni > 0) testo += `${giorni}g `;
+                testo += `${ore}h ${minuti}m ${secondi}s`;
+
+                countdownEl.textContent = testo;
+              }
+
+              aggiornaCountdown();
+              setInterval(aggiornaCountdown, 1000);
+
+            } else {
+              app.innerHTML = `
+                <span class="badge badge-inactive">Nessun Evento</span>
+                <h1>Nessuna partita in programma</h1>
+                <p>Non ci sono prossime partite registrate nel calendario.</p>
+                <button disabled class="btn btn-disabled">Nessuno Stream Attivo</button>
+              `;
+            }
+          } catch (calErr) {
+            app.innerHTML = `
+              <span class="badge badge-inactive">Errore Calendario</span>
+              <h1>Errore nel caricamento del calendario</h1>
+              <p>Dettaglio dell'errore:</p>
+              <div class="error-box">${calErr.message}</div>
+              <button disabled class="btn btn-disabled" style="margin-top:15px">Nessuno Stream Attivo</button>
+            `;
+          }
+
+          const elapsedTime = Date.now() - startTime;
+          const remainingTime = Math.max(0, minDisplayTime - elapsedTime);
+
+          setTimeout(() => {
+            const splash = document.getElementById('splash-screen');
+            if (splash) splash.classList.add('fade-out');
+          }, remainingTime);
         }
-
-        // CASO 3: NESSUN EVENTO NELLA FINESTRA DI DIRETTA -> MOSTRA GRIGLIA PROSSIMI EVENTI
-        mostraProssimiEventi(calendarioInter, calendarioF1);
-
       } catch (err) {
         app.innerHTML = `
-          <div class="hero-card">
-            <span class="badge badge-inactive">Errore Caricamento</span>
-            <h1>Impossibile sincronizzare i dati</h1>
-            <div class="error-box">${err.message}</div>
-          </div>
+          <span class="badge badge-inactive">Errore Stream</span>
+          <h1>Impossibile caricare i dati dello stream</h1>
+          <div class="error-box">${err.message}</div>
         `;
-      } finally {
-        nascondiSplash();
+
+        const elapsedTime = Date.now() - startTime;
+        const remainingTime = Math.max(0, minDisplayTime - elapsedTime);
+
+        setTimeout(() => {
+          const splash = document.getElementById('splash-screen');
+          if (splash) splash.classList.add('fade-out');
+        }, remainingTime);
       }
     }
 
-    function mostraProssimiEventi(calInter, calF1) {
-      const app = document.getElementById('app');
-
-      const prossimoInter = trovaProssimoEvento(calInter, 'inter');
-      const prossimoF1 = trovaProssimoEvento(calF1, 'f1');
-
-      let html = '<div class="events-grid">';
-      html += creaCardEvento(prossimoInter, '⚽ INTER', 'inter');
-      html += creaCardEvento(prossimoF1, '🏎️ FORMULA 1', 'f1');
-      html += '</div>';
-
-      app.innerHTML = html;
-
-      if (prossimoInter) avviaTimerCard(prossimoInter, 'timer-inter');
-      if (prossimoF1) avviaTimerCard(prossimoF1, 'timer-f1');
-
-      // Polling di background ogni 30s per verificare se entra nella finestra dei 5 minuti
-      setInterval(async () => {
-        try {
-          const res = await fetch(STREAM_JSON_URL, { cache: 'no-store' });
-          if (res.ok) {
-            const data = await res.json();
-            const interLive = isEventoLive(data.inter || (data.partita ? data : null));
-            const f1Live = isEventoLive(data.f1);
-            if (interLive || f1Live) {
-              location.reload();
-            }
-          }
-        } catch (e) {}
-      }, 30000);
-    }
-
-    function creaCardEvento(evento, titoloSport, tipo) {
-      if (!evento) {
-        return `
-          <div class="card">
-            <span class="badge badge-inactive">${titoloSport}</span>
-            <h2>Nessun evento</h2>
-            <p>Nessuna gara o partita in programma a breve.</p>
-          </div>
-        `;
-      }
-
-      const dataFormatted = evento.targetDate.toLocaleDateString('it-IT', {
-        timeZone: 'Europe/Rome',
-        weekday: 'short',
-        day: 'numeric',
-        month: 'short'
-      });
-      const dataFormattata = dataFormatted.charAt(0).toUpperCase() + dataFormatted.slice(1);
-      
-      const oraItaliana = evento.targetDate.toLocaleTimeString('it-IT', {
-        timeZone: 'Europe/Rome',
-        hour: '2-digit',
-        minute: '2-digit'
-      });
-
-      const nomeEvento = evento.partita || evento.gara || evento.gp || evento.nome || evento.titolo || 'Prossimo Evento';
-      const comp = evento.competizione || (tipo === 'f1' ? 'Formula 1' : 'Serie A');
-
-      return `
-        <div class="card">
-          <div>
-            <span class="badge badge-next">${titoloSport}</span>
-            <h2>${nomeEvento}</h2>
-            <p>
-              <strong>Data:</strong> ${dataFormattata} ore ${oraItaliana}<br>
-              <strong>Competizione:</strong> ${comp}<br>
-              <strong>Canale:</strong> ${evento.servizio || evento.canale || 'Sky / NOW'}
-            </p>
-          </div>
-          <div class="countdown-box">
-            Inizio tra:<br>
-            <strong id="timer-${tipo}">Calcolo in corso...</strong>
-          </div>
-        </div>
-      `;
-    }
-
-    function avviaTimerCard(evento, elementId) {
-      function aggiorna() {
-        const timerEl = document.getElementById(elementId);
-        if (!timerEl) return;
-
-        const adesso = new Date();
-        const diff = evento.targetDate - adesso;
-
-        if (diff <= 0) {
-          timerEl.innerHTML = '<span style="color: #60a5fa;">🔴 Evento iniziato (In attesa di segnale)...</span>';
-          return;
-        }
-
-        const giorni = Math.floor(diff / (1000 * 60 * 60 * 24));
-        const ore = Math.floor((diff % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
-        const minuti = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60));
-        const secondi = Math.floor((diff % (1000 * 60)) / 1000);
-
-        let testo = "";
-        if (giorni > 0) testo += `${giorni}g `;
-        testo += `${ore}h ${minuti}m ${secondi}s`;
-
-        timerEl.textContent = testo;
-      }
-
-      aggiorna();
-      setInterval(aggiorna, 1000);
-    }
-
-    initApp();
+    checkMatch();
   </script>
 </body>
 </html>
