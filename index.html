@@ -13,8 +13,8 @@ async function checkMatch() {
     // Calcoliamo la data/ora esatta del match in UTC
     let matchTime = null;
     if (streamData.data && (streamData.ora || streamData.orario)) {
-      const orarioUtc = streamData.ora || streamData.orario;
-      matchTime = new Date(`${streamData.data}T${orarioUtc}:00Z`);
+      const orarioLocale = streamData.ora || streamData.orario;
+      matchTime = new Date(`${streamData.data}T${orarioLocale}:00+02:00`);
     }
 
     // Calcoliamo se siamo nella finestra di reindirizzamento (5 minuti prima dell'inizio o match già iniziato)
