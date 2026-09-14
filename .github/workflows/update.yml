@@ -1,4 +1,45 @@
-name: Aggiornamento Automatico Partite Inter
+name: Aggiornamento Automatico Partite Inter e F1
+
+on:
+  schedule:
+    - cron: '0 4 * * 1' # Ogni lunedì alle 04:00 UTC
+    - cron: '0 0 * * *' # Ogni giorno alle 00:00 UTC
+  workflow_dispatch:
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v5
+
+      - name: Configura Python
+        uses: actions/setup-python@v6
+        with:
+          python-version: '3.x'
+          
+      - name: Installa dipendenze
+        run: pip install requests
+      
+      - name: Scarica Calendario Partite Inter
+        env:
+          RAPIDAPI_KEY: ${{ secrets.RAPIDAPI_KEY }}
+        run: python fetch_inter_api.py
+
+      - name: Scarica Calendario F1
+        run: python fetch_f1_api.py
+
+      - name: Genera stream.json per la data odierna
+        run: python aggiorna_stream.py
+
+      - name: Commit e Push delle modifiche
+        run: |
+          git config --local user.email "action@github.com"
+          git config --local user.name "GitHub Action"
+          
+          git add calendar.json f1_calendar.json stream.json
+          git diff --quiet && git diff --staged --quiet || (git commit -m "Auto-update Inter e F1 [skip ci]" && git push)name: Aggiornamento Automatico Partite Inter
 
 on:
   schedule:
