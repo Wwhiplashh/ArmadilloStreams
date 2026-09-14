@@ -182,40 +182,26 @@
     const STREAM_JSON_URL = `${BASE_URL}stream.json`;
     const CALENDAR_JSON_URL = `${BASE_URL}calendar.json`;
 
-    // Funzione indipendente per rimozione sicura dello splash screen
-    let splashHidden = false;
-    function hideSplashScreen() {
-      if (splashHidden) return;
-      splashHidden = true;
-      const splash = document.getElementById('splash-screen');
-      if (splash) {
-        splash.classList.add('fade-out');
-        setTimeout(() => { splash.style.display = 'none'; }, 800);
-      }
-    }
+    function hideSplashScreen(startTime) {
+      const minDisplayTime = 2000; 
+      const elapsedTime = Date.now() - startTime;
+      const remainingTime = Math.max(0, minDisplayTime - elapsedTime);
 
-    // Watchdog: dopo massimo 2.5 secondi lo splash sparisce in ogni caso
-    setTimeout(hideSplashScreen, 2500);
-
-    // Fetch con timeout integrato per evitare blocchi infiniti di rete
-    async function fetchWithTimeout(url, timeoutMs = 3000) {
-      const controller = new AbortController();
-      const id = setTimeout(() => controller.abort(), timeoutMs);
-      try {
-        const response = await fetch(url, { cache: 'no-store', signal: controller.signal });
-        clearTimeout(id);
-        return response;
-      } catch (err) {
-        clearTimeout(id);
-        throw err;
-      }
+      setTimeout(() => {
+        const splash = document.getElementById('splash-screen');
+        if (splash) {
+          splash.classList.add('fade-out');
+          setTimeout(() => { splash.style.display = 'none'; }, 800);
+        }
+      }, remainingTime);
     }
 
     async function checkMatch() {
       const app = document.getElementById('app');
+      const startTime = Date.now();
 
       try {
-        const response = await fetchWithTimeout(STREAM_JSON_URL, 3000);
+        const response = await fetch(STREAM_JSON_URL, { cache: 'no-store' });
         if (!response.ok) throw new Error(`HTTP ${response.status} caricando stream.json`);
         const streamData = await response.json();
 
@@ -238,7 +224,6 @@
                 <div>Questa partita è un'esclusiva <strong>Prime Video</strong>,<br>non sarà disponibile su Armadillo Streams.</div>
               </div>
             `;
-            hideSplashScreen();
             return;
           }
 
@@ -258,8 +243,6 @@
               </p>
             `;
 
-            hideSplashScreen();
-
             const timerEl = document.getElementById('countdown');
             const interval = setInterval(() => {
               secondiRimanenti--;
@@ -277,7 +260,7 @@
 
         // 2. NESSUNO STREAM ATTIVO -> PROSSIMO MATCH DAL CALENDARIO
         try {
-          const calResponse = await fetchWithTimeout(CALENDAR_JSON_URL, 3000);
+          const calResponse = await fetch(CALENDAR_JSON_URL, { cache: 'no-store' });
           if (!calResponse.ok) throw new Error(`HTTP ${calResponse.status} caricando calendar.json`);
           
           const dataCal = await calResponse.json();
@@ -395,7 +378,8 @@
           <div class="error-box">${err.message}</div>
         `;
       } finally {
-        hideSplashScreen();
+        // Garantisce sempre la chiusura dello splash screen
+        hideSplashScreen(startTime);
       }
     }
 
