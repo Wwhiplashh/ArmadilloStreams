@@ -199,8 +199,8 @@ def main():
     )
 
     if gara_oggi:
-        # Per la F1 il canale dedicato su Sky Sport F1 è id=555
-        url_finale_f1 = f"{dominio_base}/watch.php?id=555"
+        # Per la F1 il canale dedicato su Sky Sport F1 è id=577
+        url_finale_f1 = f"{dominio_base}/watch.php?id=577"
 
         stream_output["f1"] = {
             "attivo": True,
