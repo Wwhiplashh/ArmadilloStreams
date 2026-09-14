@@ -32,7 +32,7 @@
     "home_logo": "https://api.sofascore.app/api/v1/team/2697/image",
     "away_logo": "https://api.sofascore.app/api/v1/team/2888/image",
     "competizione": "UEFA Champions League",
-    "servizio": "Sky / NOW",
+    "servizio": "Sky Sport Uno",
     "url": ""
   },
   {
@@ -104,7 +104,7 @@
     "home_logo": "https://api.sofascore.app/api/v1/team/2959/image",
     "away_logo": "https://api.sofascore.app/api/v1/team/2697/image",
     "competizione": "UEFA Champions League",
-    "servizio": "Sky / NOW",
+    "servizio": "Sky Sport Uno",
     "url": ""
   },
   {
@@ -260,7 +260,7 @@
     "home_logo": "https://api.sofascore.app/api/v1/team/2697/image",
     "away_logo": "https://api.sofascore.app/api/v1/team/44/image",
     "competizione": "UEFA Champions League",
-    "servizio": "Sky / NOW",
+    "servizio": "Sky Sport Uno",
     "url": ""
   },
   {
