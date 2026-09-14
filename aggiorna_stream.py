@@ -11,7 +11,7 @@ DOMINI_STREAM = [
 
 CANALI_SERVIZI = {
     "DAZN": "/watch.php?id=877",
-    "Prime Video": "/watch.php?id=461",
+    "Prime Video": "",
     "Sky Sport Uno": "/watch.php?id=461" # Canale Sky per l'inter
 }
 
