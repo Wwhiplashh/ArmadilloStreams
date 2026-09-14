@@ -53,56 +53,10 @@
       object-fit: contain;
       animation: logoScaleEntrance 2s cubic-bezier(0.25, 1, 0.5, 1) forwards;
     }
-    .splash-title {
-      font-family: 'Poppins', sans-serif;
-      font-size: 2rem;
-      font-weight: 700;
-      color: #ffffff;
-      letter-spacing: 1px;
-      margin-top: -180px;
-      animation: textEntrance 2s cubic-bezier(0.25, 1, 0.5, 1) forwards;
-      opacity: 0;
-    }
-    .splash-subtitle {
-      font-family: 'Poppins', sans-serif;
-      font-size: 0.95rem;
-      color: #94a3b8;
-      margin-top: 2px;
-      animation: textEntranceSub 2s cubic-bezier(0.25, 1, 0.5, 1) 0.1s forwards;
-      opacity: 0;
-    }
 
     @keyframes logoScaleEntrance {
-      0% {
-        transform: scale(0.9);
-        opacity: 0;
-      }
-      100% {
-        transform: scale(1.05);
-        opacity: 1;
-      }
-    }
-
-    @keyframes textEntrance {
-      0% {
-        transform: translateY(15px);
-        opacity: 0;
-      }
-      100% {
-        transform: translateY(-10px);
-        opacity: 1;
-      }
-    }
-
-    @keyframes textEntranceSub {
-      0% {
-        transform: translateY(15px);
-        opacity: 0;
-      }
-      100% {
-        transform: translateY(-10px);
-        opacity: 1;
-      }
+      0% { transform: scale(0.9); opacity: 0; }
+      100% { transform: scale(1.05); opacity: 1; }
     }
 
     .card {
@@ -138,9 +92,7 @@
       margin-top: 15px;
       color: #94a3b8;
     }
-    .redirect-note strong {
-      color: #60a5fa;
-    }
+    .redirect-note strong { color: #60a5fa; }
     .countdown-box {
       background: rgba(37, 99, 235, 0.1);
       border: 1px solid #2563eb;
@@ -160,7 +112,7 @@
       border-left: 4px solid #00A8E1;
       padding: 12px 15px;
       border-radius: 6px;
-      margin: 15px 0 20px 0;
+      margin: 15px 0 15px 0;
       text-align: left;
       font-size: 0.88rem;
       color: #e2e8f0;
@@ -196,12 +148,6 @@
       box-shadow: 0 4px 14px rgba(22, 163, 74, 0.4); 
     }
     .btn-live:hover { background: #15803d; transform: translateY(-1px); }
-    .btn-prime { 
-      background: #00A8E1; 
-      color: #ffffff; 
-      box-shadow: 0 4px 14px rgba(0, 168, 225, 0.4); 
-    }
-    .btn-prime:hover { background: #008dc4; transform: translateY(-1px); }
     .btn-disabled { background: #1e293b; color: #64748b; cursor: not-allowed; }
   </style>
 </head>
@@ -238,10 +184,10 @@
         if (!response.ok) throw new Error(`HTTP ${response.status} caricando stream.json`);
         const streamData = await response.json();
 
+        // 1. EVENTO ATTIVO OGGI
         if (streamData.attivo) {
           const isPrimeVideo = streamData.servizio && streamData.servizio.toLowerCase().includes("prime video");
 
-          // CASO 1: Esclusiva Amazon Prime Video
           if (isPrimeVideo) {
             app.innerHTML = `
               <span class="badge badge-prime">📦 Esclusiva Prime Video</span>
@@ -251,9 +197,8 @@
                 <strong>Trasmissione:</strong> Amazon Prime Video
               </p>
               <div class="notice-box-prime">
-                Questa partita viene trasmessa in esclusiva su <strong>Amazon Prime Video</strong> e non è disponibile sui flussi streaming standard.
+                Questa partita viene trasmessa in esclusiva su <strong>Amazon Prime Video</strong> e non è disponibile sui flussi streaming del sito.
               </div>
-              <a href="https://www.primevideo.com" target="_blank" rel="noopener" class="btn btn-prime">APRI AMAZON PRIME VIDEO ↗</a>
             `;
 
             const elapsedTime = Date.now() - startTime;
@@ -264,10 +209,9 @@
               if (splash) splash.classList.add('fade-out');
             }, remainingTime);
 
-            return; // Nessun countdown o reindirizzamento automatico
+            return;
           }
 
-          // CASO 2: Streaming Diretta Standard con Redirect
           if (streamData.url) {
             let secondiRimanenti = 3;
 
@@ -307,7 +251,7 @@
           }
         }
 
-        // CASO 3: Nessuno Stream Attivo -> Mostra Prossima Partita dal Calendario
+        // 2. NESSUNO STREAM ATTIVO -> PROSSIMO MATCH DAL CALENDARIO
         try {
           const calResponse = await fetch(CALENDAR_JSON_URL, { cache: 'no-store' });
           if (!calResponse.ok) throw new Error(`HTTP ${calResponse.status} caricando calendar.json`);
@@ -322,17 +266,13 @@
             const matchOraUtc = p.ora || p.orario || "18:45";
             const targetDate = new Date(`${p.data}T${matchOraUtc}:00Z`);
             
-            // Mantiene la partita valida se l'orario di inizio è futuro o non è passato da più di 2 ore
             return targetDate >= (adesso - 2 * 60 * 60 * 1000);
           });
 
           if (prossimaPartita) {
             const matchOraUtc = prossimaPartita.ora || prossimaPartita.orario || "18:45";
-            
-            // Creiamo l'oggetto Date specificando UTC ('Z')
             const targetDate = new Date(`${prossimaPartita.data}T${matchOraUtc}:00Z`);
 
-            // Formattiamo la data basandoci sul fuso italiano 'Europe/Rome'
             const dataRaw = targetDate.toLocaleDateString('it-IT', {
               timeZone: 'Europe/Rome',
               weekday: 'long',
@@ -342,28 +282,39 @@
             });
             const dataFormattata = dataRaw.charAt(0).toUpperCase() + dataRaw.slice(1);
 
-            // Formattiamo l'ora convertita nel fuso italiano
             const oraItaliana = targetDate.toLocaleTimeString('it-IT', {
               timeZone: 'Europe/Rome',
               hour: '2-digit',
               minute: '2-digit'
             });
 
+            const isNextPrime = prossimaPartita.servizio && prossimaPartita.servizio.toLowerCase().includes("prime video");
+
+            const badgeHtml = isNextPrime 
+              ? '<span class="badge badge-prime">📦 Esclusiva Prime Video</span>' 
+              : '<span class="badge badge-next">Prossimo Match</span>';
+
+            const primeNoticeHtml = isNextPrime 
+              ? `<div class="notice-box-prime">
+                   ℹ️ <strong>Nota:</strong> Questa partita verrà trasmessa in esclusiva su <strong>Amazon Prime Video</strong> e non sarà fornito uno streaming diretto.
+                 </div>`
+              : '';
+
             app.innerHTML = `
-              <span class="badge badge-next">Prossimo Match</span>
+              ${badgeHtml}
               <h1>${prossimaPartita.partita}</h1>
               <p>
                 <strong>Data:</strong> ${dataFormattata} (${oraItaliana})<br>
                 <strong>Competizione:</strong> ${prossimaPartita.competizione}<br>
                 <strong>Piattaforma:</strong> ${prossimaPartita.servizio}
               </p>
+              ${primeNoticeHtml}
               <div class="countdown-box">
                 Inizio tra:<br>
                 <strong id="match-countdown">Calcolo in corso...</strong>
               </div>
             `;
 
-            // Avvia il countdown in tempo reale
             function aggiornaCountdown() {
               const adessoOra = new Date();
               const differenza = targetDate - adessoOra;
