@@ -107,17 +107,26 @@
       font-size: 1.05rem;
       letter-spacing: 0.5px;
     }
+    
+    /* Box avviso Flexbox per rientro del testo pulito */
     .notice-box-prime {
       background: rgba(0, 168, 225, 0.1);
       border-left: 4px solid #00A8E1;
       padding: 12px 15px;
       border-radius: 6px;
-      margin: 15px 0 15px 0;
+      margin: 15px 0;
       text-align: left;
       font-size: 0.88rem;
       color: #e2e8f0;
       line-height: 1.5;
+      display: flex;
+      align-items: flex-start;
+      gap: 6px;
     }
+    .notice-label {
+      white-space: nowrap;
+    }
+    
     .error-box { 
       background: rgba(239, 68, 68, 0.1); 
       border: 1px solid #ef4444; 
@@ -197,7 +206,8 @@
                 <strong>Trasmissione:</strong> Amazon Prime Video
               </p>
               <div class="notice-box-prime">
-                Questa partita viene trasmessa in esclusiva su <strong>Amazon Prime Video</strong> e non è disponibile sui flussi streaming del sito.
+                <span class="notice-label">ℹ️ <strong>Nota:</strong></span>
+                <div>Questa partita è un'esclusiva <strong>Prime Video</strong>,<br>non sarà disponibile su Armadillo Streams.</div>
               </div>
             `;
 
@@ -296,7 +306,8 @@
 
             const primeNoticeHtml = isNextPrime 
               ? `<div class="notice-box-prime">
-                   ℹ️ <strong>Nota:</strong> Questa partita è un'esclusiva <strong>Prime Video</strong>,<br> non sarà pertanto disponibile su <strong>Armadillo Streams</strong>.
+                   <span class="notice-label">ℹ️ <strong>Nota:</strong></span>
+                   <div>Questa partita è un'esclusiva <strong>Prime Video</strong>,<br>non sarà disponibile su Armadillo Streams.</div>
                  </div>`
               : '';
 
