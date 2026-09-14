@@ -1,82 +1,42 @@
-name: Aggiornamento Automatico Partite Inter e F1
+name: Aggiorna Stream JSON
 
 on:
   schedule:
-    - cron: '0 4 * * 1' # Ogni lunedì alle 04:00 UTC
-    - cron: '0 0 * * *' # Ogni giorno alle 00:00 UTC
-  workflow_dispatch:
+    # Esegue lo script ogni ora (modificabile se necessario)
+    - cron: '0 * * * *'
+  workflow_dispatch: # Permette l'esecuzione manuale da GitHub Actions
+  push:
+    branches:
+      - main
+    paths:
+      - 'calendar.json'
+      - 'f1_calendar.json'
+      - 'aggiorna_stream.py'
 
 jobs:
-  build:
+  update-stream:
     runs-on: ubuntu-latest
 
     steps:
-      - name: Check out repository
-        uses: actions/checkout@v5
+      - name: Checkout del repository
+        uses: actions/checkout@v4
 
       - name: Configura Python
-        uses: actions/setup-python@v6
+        uses: actions/setup-python@v5
         with:
-          python-version: '3.x'
-          
+          python-version: '3.11'
+
       - name: Installa dipendenze
-        run: pip install requests
-      
-      - name: Scarica Calendario Partite Inter
-        env:
-          RAPIDAPI_KEY: ${{ secrets.RAPIDAPI_KEY }}
-        run: python fetch_inter_api.py
+        run: |
+          python -m pip install --upgrade pip
+          pip install requests
 
-      - name: Scarica Calendario F1
-        run: python fetch_f1_api.py
-
-      - name: Genera stream.json per la data odierna
+      - name: Esegui aggiorna_stream.py
         run: python aggiorna_stream.py
 
-      - name: Commit e Push delle modifiche
+      - name: Commit e Push dei cambiamenti su stream.json
         run: |
-          git config --local user.email "action@github.com"
-          git config --local user.name "GitHub Action"
-          
-          git add calendar.json f1_calendar.json stream.json
-          git diff --quiet && git diff --staged --quiet || (git commit -m "Auto-update Inter e F1 [skip ci]" && git push)name: Aggiornamento Automatico Partite Inter
-
-on:
-  schedule:
-    # Esegue ogni lunedì alle 04:00 UTC per aggiornare il calendario della settimana
-    - cron: '0 4 * * 1'
-    # Esegue ogni giorno alle 00:00 UTC per generare lo stream.json del giorno
-    - cron: '0 0 * * *'
-  workflow_dispatch: # Permette l'avvio manuale da GitHub
-
-jobs:
-  build:
-    runs-on: ubuntu-latest
-
-    steps:
-      - name: Check out repository
-        uses: actions/checkout@v5
-
-      - name: Configura Python
-        uses: actions/setup-python@v6
-        with:
-          python-version: '3.x'
-          
-      - name: Installa dipendenze
-        run: pip install requests
-      
-      - name: Scarica Calendario Partite dell'Inter
-        env:
-          RAPIDAPI_KEY: ${{ secrets.RAPIDAPI_KEY }}
-        run: python fetch_inter_api.py
-
-      - name: Genera stream.json per la data odierna
-        run: python aggiorna_stream.py
-
-      - name: Commit e Push delle modifiche
-        run: |
-          git config --local user.email "action@github.com"
-          git config --local user.name "GitHub Action"
-          
-          git add calendar.json stream.json
-          git diff --quiet && git diff --staged --quiet || (git commit -m "Auto-update partite Inter [skip ci]" && git push)
+          git config --local user.email "github-actions[bot]@users.noreply.github.com"
+          git config --local user.name "github-actions[bot]"
+          git add stream.json
+          git diff --quiet && git diff --staged --quiet || (git commit -m "Auto-update stream.json" && git push)
