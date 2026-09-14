@@ -1,42 +1,41 @@
-name: Aggiorna Stream JSON
+name: Aggiornamento Automatico Partite Inter
 
 on:
   schedule:
-    # Esegue lo script ogni ora (modificabile se necessario)
-    - cron: '0 * * * *'
-  workflow_dispatch: # Permette l'esecuzione manuale da GitHub Actions
-  push:
-    branches:
-      - main
-    paths:
-      - 'calendar.json'
-      - 'f1_calendar.json'
-      - 'aggiorna_stream.py'
+    # Esegue ogni lunedì alle 04:00 UTC per aggiornare il calendario della settimana
+    - cron: '0 4 * * 1'
+    # Esegue ogni giorno alle 00:00 UTC per generare lo stream.json del giorno
+    - cron: '0 0 * * *'
+  workflow_dispatch: # Permette l'avvio manuale da GitHub
 
 jobs:
-  update-stream:
+  build:
     runs-on: ubuntu-latest
 
     steps:
-      - name: Checkout del repository
-        uses: actions/checkout@v4
+      - name: Check out repository
+        uses: actions/checkout@v5
 
       - name: Configura Python
-        uses: actions/setup-python@v5
+        uses: actions/setup-python@v6
         with:
-          python-version: '3.11'
-
+          python-version: '3.x'
+          
       - name: Installa dipendenze
-        run: |
-          python -m pip install --upgrade pip
-          pip install requests
+        run: pip install requests
+      
+      - name: Scarica Calendario Partite dell'Inter
+        env:
+          RAPIDAPI_KEY: ${{ secrets.RAPIDAPI_KEY }}
+        run: python fetch_inter_api.py
 
-      - name: Esegui aggiorna_stream.py
+      - name: Genera stream.json per la data odierna
         run: python aggiorna_stream.py
 
-      - name: Commit e Push dei cambiamenti su stream.json
+      - name: Commit e Push delle modifiche
         run: |
-          git config --local user.email "github-actions[bot]@users.noreply.github.com"
-          git config --local user.name "github-actions[bot]"
-          git add stream.json
-          git diff --quiet && git diff --staged --quiet || (git commit -m "Auto-update stream.json" && git push)
+          git config --local user.email "action@github.com"
+          git config --local user.name "GitHub Action"
+          
+          git add calendar.json stream.json
+          git diff --quiet && git diff --staged --quiet || (git commit -m "Auto-update partite Inter [skip ci]" && git push)
