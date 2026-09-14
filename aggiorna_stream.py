@@ -12,7 +12,7 @@ DOMINI_STREAM = [
 CANALI_SERVIZI = {
     "DAZN": "/watch.php?id=877",
     "Prime Video": "/watch.php?id=461",
-    "Sky / NOW": "/watch.php?id=461"
+    "Sky Sport Uno": "/watch.php?id=461" # Canale Sky per l'inter
 }
 
 def trova_dominio_base_attivo():
