@@ -31,11 +31,14 @@ jobs:
 
       - name: Genera stream.json per la data odierna
         run: python aggiorna_stream.py
-
+        
+      - name: Scarica Calendario Corse F1
+        run: python fetch_f1_api.py
+        
       - name: Commit e Push delle modifiche
         run: |
           git config --local user.email "action@github.com"
           git config --local user.name "GitHub Action"
           
           git add calendar.json stream.json
-          git diff --quiet && git diff --staged --quiet || (git commit -m "Auto-update partite Inter [skip ci]" && git push)
+          git diff --quiet && git diff --staged --quiet || (git commit -m "Auto-update Inter e F1 [skip ci]" && git push)
