@@ -34,6 +34,9 @@ jobs:
         
       - name: Scarica Calendario Corse F1
         run: python fetch_f1_api.py
+
+      - name: Genera f1_stream.json per la data odierna
+        run: python aggiorna_f1_stream.py
         
       - name: Commit e Push delle modifiche
         run: |
