@@ -1,10 +1,10 @@
-name: Aggiornamento Automatico Partite Inter
+name: Aggiornamento Automatico Partite Inter e F1
 
 on:
   schedule:
-    # Esegue ogni lunedì alle 04:00 UTC per aggiornare il calendario della settimana
+    # Esegue ogni lunedì alle 04:00 UTC per aggiornare i calendari
     - cron: '0 4 * * 1'
-    # Esegue ogni giorno alle 00:00 UTC per generare lo stream.json del giorno
+    # Esegue ogni giorno alle 00:00 UTC per aggiornare lo stato degli stream
     - cron: '0 0 * * *'
   workflow_dispatch: # Permette l'avvio manuale da GitHub
 
@@ -23,7 +23,7 @@ jobs:
           
       - name: Installa dipendenze
         run: pip install requests
-      
+        
       - name: Scarica Calendario Partite dell'Inter
         env:
           RAPIDAPI_KEY: ${{ secrets.RAPIDAPI_KEY }}
@@ -40,5 +40,8 @@ jobs:
           git config --local user.email "action@github.com"
           git config --local user.name "GitHub Action"
           
-          git add calendar.json stream.json
-          git diff --quiet && git diff --staged --quiet || (git commit -m "Auto-update Inter e F1 [skip ci]" && git push)
+          # Aggiunge tutti i file modificati (Inter + F1)
+          git add .
+          
+          # Esegue il commit ed il push solo se ci sono effettive modifiche staged
+          git diff --staged --quiet || (git commit -m "🤖 Auto-update Inter e F1 [skip ci]" && git push)
