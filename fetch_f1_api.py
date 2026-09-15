@@ -2,7 +2,7 @@ import json
 import urllib.request
 
 # URL dell'API gratuita di Formula 1 (Stagione Corrente)
-API_URL = "https://api.jolpica.net/ergast/f1/current.json"
+API_URL = "https://api.jolpi.ca/ergast/f1/current.json"
 
 # Mappatura per tradurre i nomi dei Gran Premi in italiano
 GP_NAMES_IT = {
