@@ -306,7 +306,7 @@
           if (isPrimeVideo) {
             app.innerHTML = `
               <div>
-                <span class="badge badge-prime">📦 Esclusiva Prime Video</span>
+                <span class="badge badge-prime"><strong>Esclusiva Prime Video</strong></span>
                 <h1>${streamData.partita || 'Partita Inter'}</h1>
                 <p>
                   <strong>Competizione:</strong> ${streamData.competizione || '-'}<br>
@@ -314,7 +314,7 @@
                 </p>
               </div>
               <div class="notice-box-prime">
-                <div>ℹ️ <strong>Nota:</strong></div>
+                <div><strong>⚠️Avviso⚠️</strong></div>
                 <div>Questa partita è un'esclusiva <strong>Prime Video</strong>,<br>non sarà disponibile su Armadillo Streams.</div>
               </div>
             `;
@@ -363,12 +363,12 @@
 
             const isNextPrime = prossimaPartita.servizio && prossimaPartita.servizio.toLowerCase().includes("prime video");
             const badgeHtml = isNextPrime 
-              ? '<span class="badge badge-prime">📦 Esclusiva Prime Video</span>' 
+              ? '<span class="badge badge-prime"><strong>Esclusiva Prime Video</strong></span>' 
               : '<span class="badge badge-next">Prossimo Match</span>';
 
             const primeNoticeHtml = isNextPrime 
               ? `<div class="notice-box-prime">
-                   <div>ℹ️ <strong>Nota:</strong></div>
+                   <div><strong>⚠️Avviso⚠️</strong></div>
                    <div>Questa partita è un'esclusiva <strong>Prime Video</strong>,<br>non sarà disponibile su Armadillo Streams.</div>
                  </div>` 
               : '';
