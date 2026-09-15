@@ -1,0 +1,18 @@
+{
+  "gare": [
+    {
+      "data": "2026-03-07",
+      "ora": "05:00",
+      "gran_premio": "GP d'Australia - Qualifiche",
+      "competizione": "Formula 1",
+      "servizio": "Sky Sport F1 / NOW"
+    },
+    {
+      "data": "2026-03-08",
+      "ora": "04:00",
+      "gran_premio": "GP d'Australia - Gara",
+      "competizione": "Formula 1",
+      "servizio": "Sky Sport F1 / NOW"
+    }
+  ]
+}
