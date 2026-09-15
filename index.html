@@ -418,7 +418,7 @@
     }
 
     // --- 2. GESTIONE CARD FORMULA 1 (LAYOUT 2/3 DIVISI + 1/3 BOTTONE) ---
-  async function loadF1Card() {
+async function loadF1Card() {
       const app = document.getElementById('app-f1');
 
       try {
@@ -428,10 +428,7 @@
 
         const isAttivo = streamData.attivo === true || streamData.attivo === 'true';
 
-        let qualificaInfo = null;
-        let garaInfo = null;
-        let nomeGP = "Gran Premio F1";
-
+        let prossimoEvento = null;
         try {
           const calResponse = await fetch(`${BASE_URL}f1_calendar.json`, { cache: 'no-store' });
           if (calResponse.ok) {
@@ -439,57 +436,34 @@
             const gare = Array.isArray(dataCal) ? dataCal : (dataCal.gare || []);
             const adesso = new Date();
 
-            const prossimoEventoIndex = gare.findIndex(g => {
+            // Cerca la prima sessione (Qualifiche o Gara) non ancora conclusa (tolleranza 2 ore dall'inizio)
+            prossimoEvento = gare.find(g => {
               if (!g || !g.data) return false;
               const targetDate = new Date(`${g.data}T${g.ora || "15:00"}:00Z`);
-              return !isNaN(targetDate) && targetDate >= (adesso - 3 * 60 * 60 * 1000);
+              return !isNaN(targetDate) && targetDate >= (adesso - 2 * 60 * 60 * 1000);
             });
-
-            if (prossimoEventoIndex !== -1) {
-              const eventoBase = gare[prossimoEventoIndex];
-              nomeGP = (eventoBase.gran_premio || "").split(" - ")[0] || "Gran Premio F1";
-
-              const sessioniGP = gare.filter(g => g.gran_premio && g.gran_premio.startsWith(nomeGP));
-              qualificaInfo = sessioniGP.find(g => g.gran_premio.includes("Qualifiche") || g.gran_premio.includes("Sprint Shootout"));
-              garaInfo = sessioniGP.find(g => g.gran_premio.endsWith("- Gara") || g.gran_premio.includes("Gara Sprint"));
-            }
           }
         } catch (e) { console.error("Errore lettura calendario F1", e); }
 
-        const qualData = qualificaInfo ? formatDateTimeIT(qualificaInfo.data, qualificaInfo.ora) : null;
-        const garaData = garaInfo ? formatDateTimeIT(garaInfo.data, garaInfo.ora) : null;
+        const eventoData = prossimoEvento ? formatDateTimeIT(prossimoEvento.data, prossimoEvento.ora) : null;
+        
+        // Separa il nome del GP dal tipo di sessione (es. "GP dell'Azerbaigian - Qualifiche")
+        let nomeGP = "Formula 1";
+        let tipoSessione = "Gara";
+        if (prossimoEvento && prossimoEvento.gran_premio) {
+          const parts = prossimoEvento.gran_premio.split(" - ");
+          nomeGP = parts[0] || "Formula 1";
+          tipoSessione = parts[1] || "Gara";
+        }
 
         let badgeHtml = isAttivo 
           ? '<span class="badge badge-active">🔴 In Diretta F1</span>' 
-          : '<span class="badge badge-next">Prossimo Weekend</span>';
+          : '<span class="badge badge-next">Prossimo Evento</span>';
 
-        // Verifica se la qualifica è conclusa
-        const adesso = new Date();
-        const qualificaTerminata = qualData && qualData.rawDate && (adesso > (qualData.rawDate.getTime() + 60 * 60 * 1000));
-        const haRisultatiFerrari = qualificaInfo && qualificaInfo.ferrari_qualy;
-
-        // Box Qualifiche: Risultati Ferrari se conclusa, altrimenti Countdown
-        let qualificaBoxHtml = '';
-        if (haRisultatiFerrari || qualificaTerminata) {
-          const testoFerrari = haRisultatiFerrari ? qualificaInfo.ferrari_qualy : 'Qualifiche Concluse';
-          qualificaBoxHtml = `
-            <div class="countdown-box" style="background: rgba(220, 38, 38, 0.15); border-color: #dc2626; padding: 12px 8px;">
-              <span style="color: #f87171; font-weight: 700; font-size: 0.85rem;">🏎️ Ferrari</span><br>
-              <strong style="color: #ffffff; font-size: 0.95rem;">${testoFerrari}</strong>
-            </div>
-          `;
-        } else {
-          qualificaBoxHtml = `
-            <div class="countdown-box" style="padding: 12px 8px;">
-              <strong id="f1-qual-cd">${qualData ? 'Calcolo...' : '-'}</strong>
-            </div>
-          `;
-        }
-
-        // Se lo stream NON è attivo, la sezione bottone viene totalmente OMESSA
+        // Il pulsante compare solo se lo stream è attivo
         const bottomSectionHtml = isAttivo && streamData.url ? `
-          <div class="f1-bottom-section" style="margin-top: 15px;">
-            <a href="${streamData.url}" target="_blank" class="btn btn-live">AVVIA LO STREAMING F1</a>
+          <div style="margin-top: 15px;">
+            <a href="${streamData.url}" target="_blank" class="btn btn-live">AVVIA STREAMING F1</a>
             <p class="redirect-note" id="f1-note">
               Reindirizzamento automatico tra <strong id="f1-cd">3</strong> secondi...
             </p>
@@ -502,28 +476,15 @@
               ${badgeHtml}
               <h1 style="margin-bottom: 20px;">${nomeGP}</h1>
 
-              <div class="f1-split-container">
-                
-                <!-- COLONNA QUALIFICA -->
-                <div class="f1-col">
-                  <div class="f1-col-title">⏱️ Qualifica</div>
-                  <div class="f1-col-details" style="margin-bottom: 12px;">
-                    ${qualData ? `<strong>${qualData.data}</strong><br>Ore ${qualData.ora}` : 'Data da destinarsi'}
-                  </div>
-                  ${qualificaBoxHtml}
-                </div>
+              <div class="match-details" style="margin-bottom: 15px;">
+                ${eventoData ? `<p><strong>Data:</strong> ${eventoData.data} (${eventoData.ora})</p>` : ''}
+                <p><strong>Sessione:</strong> ${tipoSessione}</p>
+                <p><strong>Piattaforma:</strong> ${prossimoEvento?.servizio || 'Sky Sport F1 / NOW'}</p>
+              </div>
 
-                <!-- COLONNA GARA -->
-                <div class="f1-col">
-                  <div class="f1-col-title">🏎️ Gara</div>
-                  <div class="f1-col-details" style="margin-bottom: 12px;">
-                    ${garaData ? `<strong>${garaData.data}</strong><br>Ore ${garaData.ora}` : 'Data da destinarsi'}
-                  </div>
-                  <div class="countdown-box" style="padding: 12px 8px;">
-                    <strong id="f1-gara-cd">${garaData ? 'Calcolo...' : '-'}</strong>
-                  </div>
-                </div>
-
+              <div class="countdown-box" style="padding: 12px 8px;">
+                <div>Inizio ${tipoSessione} tra:</div>
+                <strong id="f1-match-cd">${eventoData ? 'Calcolo...' : '-'}</strong>
               </div>
             </div>
 
@@ -531,13 +492,12 @@
           </div>
         `;
 
-        function setupTimer(targetDt, elementId, labelTerminato) {
-          if (!targetDt) return;
+        if (eventoData && eventoData.rawDate) {
           const interval = setInterval(() => {
-            const diff = targetDt - new Date();
-            const el = document.getElementById(elementId);
+            const diff = eventoData.rawDate - new Date();
+            const el = document.getElementById('f1-match-cd');
             if (!el) return clearInterval(interval);
-            if (diff <= 0) { el.textContent = labelTerminato; return; }
+            if (diff <= 0) { el.textContent = `${tipoSessione} Iniziata!`; return; }
             const g = Math.floor(diff / 86400000);
             const h = Math.floor((diff % 86400000) / 3600000);
             const m = Math.floor((diff % 3600000) / 60000);
@@ -545,11 +505,6 @@
             el.textContent = `${g > 0 ? g + 'g ' : ''}${h}h ${m}m ${s}s`;
           }, 1000);
         }
-
-        if (!haRisultatiFerrari && !qualificaTerminata && qualData && qualData.rawDate) {
-          setupTimer(qualData.rawDate, 'f1-qual-cd', 'Qualifica Iniziata!');
-        }
-        if (garaData && garaData.rawDate) setupTimer(garaData.rawDate, 'f1-gara-cd', 'Gara Iniziata!');
 
         if (isAttivo && streamData.url) {
           return { attivo: true, url: streamData.url, countdownPrefix: 'f1' };
