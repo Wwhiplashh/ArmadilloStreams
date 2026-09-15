@@ -119,7 +119,7 @@
       border-radius: 10px;
       font-size: 0.85rem;
       color: #94a3b8;
-      margin-top: 10px;
+      width: 100%;
     }
     .countdown-box strong {
       color: #60a5fa;
@@ -129,13 +129,13 @@
     
     /* Layout a due colonne per la Formula 1 */
     .f1-split-container {
-  display: flex;
-  justify-content: space-between;
-  gap: 15px;
-  border-bottom: none; /* Rimuove la linea orizzontale */
-  padding-bottom: 0;   /* Elimina lo spazio interno inferiore */
-  margin-bottom: 12px; /* Margine compatto verso il countdown */
-}
+      display: flex;
+      justify-content: space-between;
+      gap: 15px;
+      border-bottom: none;
+      padding-bottom: 0;
+      margin-bottom: 15px;
+    }
     .f1-col {
       flex: 1;
       display: flex;
@@ -162,11 +162,6 @@
     }
     .f1-col-details strong {
       color: #ffffff;
-    }
-    
-    /* Terzo inferiore F1 */
-    .f1-bottom-section {
-      width: 100%;
     }
     
     /* Box avviso centrato */
@@ -235,7 +230,7 @@
       </div>
     </div>
 
-    <!-- Card 2: Formula 1 (Divisa in 2/3 superiori + 1/3 inferiore) -->
+    <!-- Card 2: Formula 1 -->
     <div class="card" id="app-f1">
       <div>
         <span class="badge badge-next">Verifica in corso...</span>
@@ -310,10 +305,10 @@
                   <strong>Competizione:</strong> ${streamData.competizione || '-'}<br>
                   <strong>Trasmissione:</strong> Amazon Prime Video
                 </p>
-                <div class="notice-box-prime">
-                  <div>ℹ️ <strong>Nota:</strong></div>
-                  <div>Questa partita è un'esclusiva <strong>Prime Video</strong>,<br>non sarà disponibile su Armadillo Streams.</div>
-                </div>
+              </div>
+              <div class="notice-box-prime">
+                <div>ℹ️ <strong>Nota:</strong></div>
+                <div>Questa partita è un'esclusiva <strong>Prime Video</strong>,<br>non sarà disponibile su Armadillo Streams.</div>
               </div>
             `;
             return { attivo: false };
@@ -328,6 +323,8 @@
                   <strong>Competizione:</strong> ${streamData.competizione || '-'}<br>
                   <strong>Trasmissione:</strong> ${streamData.servizio || '-'}
                 </p>
+              </div>
+              <div>
                 <a href="${streamData.url}" target="_blank" class="btn btn-live">AVVIA LO STREAMING</a>
                 <p class="redirect-note" id="inter-note">
                   Reindirizzamento automatico tra <strong id="inter-cd">3</strong> secondi...
@@ -379,10 +376,10 @@
                   <strong>Piattaforma:</strong> ${prossimaPartita.servizio || '-'}
                 </p>
                 ${primeNoticeHtml}
-                <div class="countdown-box">
-                  Inizio tra:<br>
-                  <strong id="inter-match-cd">Calcolo in corso...</strong>
-                </div>
+              </div>
+              <div class="countdown-box">
+                Inizio tra:<br>
+                <strong id="inter-match-cd">Calcolo in corso...</strong>
               </div>
             `;
 
@@ -417,8 +414,8 @@
       return { attivo: false };
     }
 
-    // --- 2. GESTIONE CARD FORMULA 1 (LAYOUT 2/3 DIVISI + 1/3 BOTTONE) ---
-async function loadF1Card() {
+    // --- 2. GESTIONE CARD FORMULA 1 ---
+    async function loadF1Card() {
       const app = document.getElementById('app-f1');
 
       try {
@@ -493,7 +490,7 @@ async function loadF1Card() {
           qualificaDettagliHtml = qualData ? `<strong>${qualData.data}</strong><br>Ore ${qualData.ora}` : 'Data da destinarsi';
         }
 
-        // Il pulsante compare SOLO se lo stream è attivo
+        // Sezione streaming attivo
         const bottomSectionHtml = isAttivo && streamData.url ? `
           <div style="margin-top: 15px;">
             <a href="${streamData.url}" target="_blank" class="btn btn-live">AVVIA STREAMING F1</a>
@@ -504,39 +501,38 @@ async function loadF1Card() {
         ` : '';
 
         app.innerHTML = `
-          <div style="display: flex; flex-direction: column; height: 100%; justify-content: space-between;">
-            <div>
-              ${badgeHtml}
-              <h1 style="margin-bottom: 20px;">${nomeGP}</h1>
+          <div>
+            ${badgeHtml}
+            <h1 style="margin-bottom: 20px;">${nomeGP}</h1>
 
-              <!-- SEZIONE A DUE COLONNE: QUALIFICA E GARA -->
-              <div class="f1-split-container" style="margin-bottom: 15px;">
-                
-                <!-- COLONNA QUALIFICA -->
-                <div class="f1-col">
-                  <div class="f1-col-title">⏱️ Qualifica</div>
-                  <div class="f1-col-details">
-                    ${qualificaDettagliHtml}
-                  </div>
+            <!-- SEZIONE A DUE COLONNE: QUALIFICA E GARA -->
+            <div class="f1-split-container">
+              
+              <!-- COLONNA QUALIFICA -->
+              <div class="f1-col">
+                <div class="f1-col-title">⏱️ Qualifica</div>
+                <div class="f1-col-details">
+                  ${qualificaDettagliHtml}
                 </div>
-
-                <!-- COLONNA GARA -->
-                <div class="f1-col">
-                  <div class="f1-col-title">🏎️ Gara</div>
-                  <div class="f1-col-details">
-                    ${garaData ? `<strong>${garaData.data}</strong><br>Ore ${garaData.ora}` : 'Data da destinarsi'}
-                  </div>
-                </div>
-
               </div>
 
-              <!-- UNICO COUNTDOWN IN BASSO -->
-              <div class="countdown-box" style="padding: 12px 8px;">
-                <div>Inizio ${etichettaTarget} tra:</div>
-                <strong id="f1-match-cd">${targetEventoData ? 'Calcolo...' : '-'}</strong>
+              <!-- COLONNA GARA -->
+              <div class="f1-col">
+                <div class="f1-col-title">🏎️ Gara</div>
+                <div class="f1-col-details">
+                  ${garaData ? `<strong>${garaData.data}</strong><br>Ore ${garaData.ora}` : 'Data da destinarsi'}
+                </div>
               </div>
+
             </div>
+          </div>
 
+          <!-- UNICO COUNTDOWN IN BASSO SEPARATO -->
+          <div>
+            <div class="countdown-box" style="padding: 12px 8px;">
+              <div>Inizio ${etichettaTarget} tra:</div>
+              <strong id="f1-match-cd">${targetEventoData ? 'Calcolo...' : '-'}</strong>
+            </div>
             ${bottomSectionHtml}
           </div>
         `;
