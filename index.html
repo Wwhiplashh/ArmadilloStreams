@@ -129,13 +129,13 @@
     
     /* Layout a due colonne per la Formula 1 */
     .f1-split-container {
-      display: flex;
-      gap: 15px;
-      border-bottom: 1px solid rgba(29, 78, 216, 0.4);
-      padding-bottom: 20px;
-      margin-bottom: 20px;
-      text-align: center;
-    }
+  display: flex;
+  justify-content: space-between;
+  gap: 15px;
+  border-bottom: none; /* Rimuove la linea orizzontale */
+  padding-bottom: 0;   /* Elimina lo spazio interno inferiore */
+  margin-bottom: 12px; /* Margine compatto verso il countdown */
+}
     .f1-col {
       flex: 1;
       display: flex;
