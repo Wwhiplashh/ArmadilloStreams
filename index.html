@@ -60,17 +60,40 @@
       100% { transform: scale(1.05); opacity: 1; }
     }
 
+    /* Container Griglia Cards */
+    .cards-container {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 25px;
+      justify-content: center;
+      align-items: stretch;
+      max-width: 1050px;
+      width: 100%;
+    }
+
     .card {
       background: rgba(13, 27, 54, 0.85);
       border: 1px solid #1d4ed8;
       box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
       border-radius: 16px;
-      padding: 35px;
-      max-width: 480px;
+      padding: 30px;
+      margin: 0;
+      box-sizing: border-box;
+      flex: 1 1 450px;
+      max-width: 500px;
       width: 100%;
       text-align: center;
       backdrop-filter: blur(10px);
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
     }
+
+    .card > div:first-child {
+      margin-top: 0;
+      padding-top: 0;
+    }
+
     .badge {
       display: inline-block;
       padding: 6px 14px;
@@ -78,35 +101,82 @@
       font-size: 0.85rem;
       font-weight: 700;
       text-transform: uppercase;
-      margin-bottom: 20px;
+      margin-bottom: 16px;
       letter-spacing: 0.5px;
+      align-self: center;
     }
     .badge-active { background: #16a34a; color: #fff; }
     .badge-next { background: #2563eb; color: #fff; }
     .badge-inactive { background: #ef4444; color: #fff; }
     .badge-prime { background: #00A8E1; color: #020b18; }
 
-    h1 { font-size: 1.6rem; font-weight: 800; margin-bottom: 12px; }
+    h1 { font-size: 1.5rem; font-weight: 800; margin-bottom: 12px; }
     p { color: #94a3b8; font-size: 0.95rem; line-height: 1.6; margin-bottom: 20px; }
+    
     .redirect-note {
       font-size: 0.85rem;
       margin-top: 15px;
       color: #94a3b8;
     }
     .redirect-note strong { color: #60a5fa; }
+    
+    /* Box Countdown Uniformato */
     .countdown-box {
       background: rgba(37, 99, 235, 0.1);
       border: 1px solid #2563eb;
-      padding: 12px;
+      padding: 12px 10px;
       border-radius: 10px;
-      font-size: 0.9rem;
+      width: 100%;
+      text-align: center;
+    }
+    .countdown-box span {
+      display: block;
+      font-size: 0.85rem;
       color: #94a3b8;
-      margin-top: 15px;
+      margin-bottom: 4px;
     }
     .countdown-box strong {
+      display: block;
       color: #60a5fa;
-      font-size: 1.05rem;
+      font-size: 0.98rem;
       letter-spacing: 0.5px;
+    }
+    
+    /* Layout a due colonne per la Formula 1 */
+    .f1-split-container {
+      display: flex;
+      justify-content: space-between;
+      gap: 15px;
+      border-bottom: none;
+      padding-bottom: 0;
+      margin-bottom: 20px;
+    }
+    .f1-col {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+    }
+    .f1-col:first-child {
+      border-right: 1px solid rgba(29, 78, 216, 0.4);
+      padding-right: 15px;
+    }
+    .f1-col-title {
+      font-size: 0.95rem;
+      font-weight: 700;
+      color: #60a5fa;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      margin-bottom: 6px;
+    }
+    .f1-col-details {
+      font-size: 1.05rem;
+      color: #cbd5e1;
+      line-height: 1.35;
+      margin-bottom: 0;
+    }
+    .f1-col-details strong {
+      color: #ffffff;
     }
     
     /* Box avviso centrato */
@@ -166,9 +236,22 @@
     <img src="logo.png" alt="Logo Armadillo" class="splash-logo">
   </div>
 
-  <div class="card" id="app">
-    <div class="badge badge-next">Verifica in corso...</div>
-    <h1>Connessione al server...</h1>
+  <div class="cards-container">
+    <!-- Card 1: Inter / Calcio -->
+    <div class="card" id="app-inter">
+      <div>
+        <span class="badge badge-next">Verifica in corso...</span>
+        <h1>Connessione Inter...</h1>
+      </div>
+    </div>
+
+    <!-- Card 2: Formula 1 -->
+    <div class="card" id="app-f1">
+      <div>
+        <span class="badge badge-next">Verifica in corso...</span>
+        <h1>Connessione F1...</h1>
+      </div>
+    </div>
   </div>
 
   <script>
@@ -178,9 +261,6 @@
     const BASE_URL = window.location.protocol === 'file:' 
       ? `https://raw.githubusercontent.com/${REPO_USER}/${REPO_NAME}/main/`
       : './';
-
-    const STREAM_JSON_URL = `${BASE_URL}stream.json`;
-    const CALENDAR_JSON_URL = `${BASE_URL}calendar.json`;
 
     function hideSplashScreen(startTime) {
       const minDisplayTime = 2000; 
@@ -196,73 +276,84 @@
       }, remainingTime);
     }
 
-    async function checkMatch() {
-      const app = document.getElementById('app');
-      const startTime = Date.now();
+    // Helper per formattare la data UTC in fuso orario italiano
+    function formatDateTimeIT(dateStr, timeStr) {
+      const targetDate = new Date(`${dateStr}T${timeStr}:00Z`);
+      if (isNaN(targetDate)) return { data: dateStr, ora: timeStr, rawDate: null };
+
+      const dataRaw = targetDate.toLocaleDateString('it-IT', {
+        timeZone: 'Europe/Rome',
+        weekday: 'short',
+        day: 'numeric',
+        month: 'short'
+      });
+      const dataFormattata = dataRaw.charAt(0).toUpperCase() + dataRaw.slice(1);
+
+      const oraItaliana = targetDate.toLocaleTimeString('it-IT', {
+        timeZone: 'Europe/Rome',
+        hour: '2-digit',
+        minute: '2-digit'
+      });
+
+      return { data: dataFormattata, ora: oraItaliana, rawDate: targetDate };
+    }
+
+    // --- 1. GESTIONE CARD INTER ---
+    async function loadInterCard() {
+      const app = document.getElementById('app-inter');
 
       try {
-        const response = await fetch(STREAM_JSON_URL, { cache: 'no-store' });
+        const response = await fetch(`${BASE_URL}stream.json`, { cache: 'no-store' });
         if (!response.ok) throw new Error(`HTTP ${response.status} caricando stream.json`);
         const streamData = await response.json();
 
         const isAttivo = streamData.attivo === true || streamData.attivo === 'true';
 
-        // 1. EVENTO ATTIVO OGGI
         if (isAttivo) {
           const isPrimeVideo = streamData.servizio && streamData.servizio.toLowerCase().includes("prime video");
-
           if (isPrimeVideo) {
             app.innerHTML = `
-              <span class="badge badge-prime">📦 Esclusiva Prime Video</span>
-              <h1>${streamData.partita || 'Partita in Programma'}</h1>
-              <p>
-                <strong>Competizione:</strong> ${streamData.competizione || '-'}<br>
-                <strong>Trasmissione:</strong> Amazon Prime Video
-              </p>
+              <div>
+                <span class="badge badge-prime">📦 Esclusiva Prime Video</span>
+                <h1>${streamData.partita || 'Partita Inter'}</h1>
+                <p>
+                  <strong>Competizione:</strong> ${streamData.competizione || '-'}<br>
+                  <strong>Trasmissione:</strong> Amazon Prime Video
+                </p>
+              </div>
               <div class="notice-box-prime">
-                <div>⚠️ <strong>Attenzione</strong> ⚠️</div>
+                <div>ℹ️ <strong>Nota:</strong></div>
                 <div>Questa partita è un'esclusiva <strong>Prime Video</strong>,<br>non sarà disponibile su Armadillo Streams.</div>
               </div>
             `;
-            return;
+            return { attivo: false };
           }
 
           if (streamData.url) {
-            let secondiRimanenti = 3;
-
             app.innerHTML = `
-              <span class="badge badge-active">🔴 In Diretta Oggi</span>
-              <h1>${streamData.partita || 'Partita in Diretta'}</h1>
-              <p>
-                <strong>Competizione:</strong> ${streamData.competizione || '-'}<br>
-                <strong>Trasmissione:</strong> ${streamData.servizio || '-'}
-              </p>
-              <a href="${streamData.url}" class="btn btn-live">AVVIA LO STREAMING</a>
-              <p class="redirect-note">
-                Reindirizzamento automatico tra <strong id="countdown">3</strong> secondi...
-              </p>
+              <div>
+                <span class="badge badge-active">🔴 In Diretta Oggi</span>
+                <h1>${streamData.partita || 'Partita Inter'}</h1>
+                <p>
+                  <strong>Competizione:</strong> ${streamData.competizione || '-'}<br>
+                  <strong>Trasmissione:</strong> ${streamData.servizio || '-'}
+                </p>
+              </div>
+              <div>
+                <a href="${streamData.url}" target="_blank" class="btn btn-live">AVVIA LO STREAMING</a>
+                <p class="redirect-note" id="inter-note">
+                  Reindirizzamento automatico tra <strong id="inter-cd">3</strong> secondi...
+                </p>
+              </div>
             `;
-
-            const timerEl = document.getElementById('countdown');
-            const interval = setInterval(() => {
-              secondiRimanenti--;
-              if (timerEl) timerEl.textContent = secondiRimanenti;
-              
-              if (secondiRimanenti <= 0) {
-                clearInterval(interval);
-                window.location.href = streamData.url;
-              }
-            }, 1000);
-
-            return;
+            return { attivo: true, url: streamData.url, countdownPrefix: 'inter' };
           }
         }
 
-        // 2. NESSUNO STREAM ATTIVO -> PROSSIMO MATCH DAL CALENDARIO
+        // Prossimo Match dal Calendario
         try {
-          const calResponse = await fetch(CALENDAR_JSON_URL, { cache: 'no-store' });
-          if (!calResponse.ok) throw new Error(`HTTP ${calResponse.status} caricando calendar.json`);
-          
+          const calResponse = await fetch(`${BASE_URL}calendar.json`, { cache: 'no-store' });
+          if (!calResponse.ok) throw new Error(`HTTP ${calResponse.status}`);
           const dataCal = await calResponse.json();
           const calendario = Array.isArray(dataCal) ? dataCal : (dataCal.partite || []);
           const adesso = new Date();
@@ -276,114 +367,259 @@
 
           if (prossimaPartita) {
             const matchOraUtc = prossimaPartita.ora || prossimaPartita.orario || "18:45";
-            const targetDate = new Date(`${prossimaPartita.data}T${matchOraUtc}:00Z`);
-
-            let dataFormattata = prossimaPartita.data;
-            let oraItaliana = matchOraUtc;
-
-            if (!isNaN(targetDate)) {
-              const dataRaw = targetDate.toLocaleDateString('it-IT', {
-                timeZone: 'Europe/Rome',
-                weekday: 'long',
-                day: 'numeric',
-                month: 'long',
-                year: 'numeric'
-              });
-              dataFormattata = dataRaw.charAt(0).toUpperCase() + dataRaw.slice(1);
-
-              oraItaliana = targetDate.toLocaleTimeString('it-IT', {
-                timeZone: 'Europe/Rome',
-                hour: '2-digit',
-                minute: '2-digit'
-              });
-            }
+            const dtInfo = formatDateTimeIT(prossimaPartita.data, matchOraUtc);
 
             const isNextPrime = prossimaPartita.servizio && prossimaPartita.servizio.toLowerCase().includes("prime video");
-
             const badgeHtml = isNextPrime 
-              ? '<span class="badge badge-prime"><strong>Esclusiva Prime Video</strong></span>' 
+              ? '<span class="badge badge-prime">📦 Esclusiva Prime Video</span>' 
               : '<span class="badge badge-next">Prossimo Match</span>';
 
             const primeNoticeHtml = isNextPrime 
               ? `<div class="notice-box-prime">
-                   <div>⚠️ <strong>Attenzione</strong> ⚠️</div>
+                   <div>ℹ️ <strong>Nota:</strong></div>
                    <div>Questa partita è un'esclusiva <strong>Prime Video</strong>,<br>non sarà disponibile su Armadillo Streams.</div>
-                 </div>`
+                 </div>` 
               : '';
 
             app.innerHTML = `
-              ${badgeHtml}
-              <h1>${prossimaPartita.partita || 'Prossima Partita'}</h1>
-              <p>
-                <strong>Data:</strong> ${dataFormattata} (${oraItaliana})<br>
-                <strong>Competizione:</strong> ${prossimaPartita.competizione || '-'}<br>
-                <strong>Piattaforma:</strong> ${prossimaPartita.servizio || '-'}
-              </p>
-              ${primeNoticeHtml}
-              <div class="countdown-box">
-                Inizio tra:<br>
-                <strong id="match-countdown">Calcolo in corso...</strong>
+              <div>
+                ${badgeHtml}
+                <h1>${prossimaPartita.partita || 'Prossima Partita'}</h1>
+                <p>
+                  <strong>Data:</strong> ${dtInfo.data} (${dtInfo.ora})<br>
+                  <strong>Competizione:</strong> ${prossimaPartita.competizione || '-'}<br>
+                  <strong>Piattaforma:</strong> ${prossimaPartita.servizio || '-'}
+                </p>
+                ${primeNoticeHtml}
+              </div>
+              <div>
+                <div class="countdown-box">
+                  <span>Inizio tra:</span>
+                  <strong id="inter-match-cd">Calcolo in corso...</strong>
+                </div>
               </div>
             `;
 
-            function aggiornaCountdown() {
-              const adessoOra = new Date();
-              const differenza = targetDate - adessoOra;
-
-              const countdownEl = document.getElementById('match-countdown');
-              if (!countdownEl) return;
-
-              if (isNaN(differenza) || differenza <= 0) {
-                countdownEl.textContent = "Match in corso o appena iniziato!";
-                return;
-              }
-
-              const giorni = Math.floor(differenza / (1000 * 60 * 60 * 24));
-              const ore = Math.floor((differenza % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
-              const minuti = Math.floor((differenza % (1000 * 60 * 60)) / (1000 * 60));
-              const secondi = Math.floor((differenza % (1000 * 60)) / 1000);
-
-              let testo = "";
-              if (giorni > 0) testo += `${giorni}g `;
-              testo += `${ore}h ${minuti}m ${secondi}s`;
-
-              countdownEl.textContent = testo;
+            if (dtInfo.rawDate) {
+              const interval = setInterval(() => {
+                const diff = dtInfo.rawDate - new Date();
+                const el = document.getElementById('inter-match-cd');
+                if (!el) return clearInterval(interval);
+                if (diff <= 0) { el.textContent = "Match in corso!"; return; }
+                const g = Math.floor(diff / 86400000);
+                const h = Math.floor((diff % 86400000) / 3600000);
+                const m = Math.floor((diff % 3600000) / 60000);
+                const s = Math.floor((diff % 60000) / 1000);
+                el.textContent = `${g > 0 ? g + 'g ' : ''}${h}h ${m}m ${s}s`;
+              }, 1000);
             }
-
-            aggiornaCountdown();
-            setInterval(aggiornaCountdown, 1000);
-
           } else {
             app.innerHTML = `
-              <span class="badge badge-inactive">Nessun Evento</span>
-              <h1>Nessuna partita in programma</h1>
-              <p>Non ci sono prossime partite registrate nel calendario.</p>
+              <div>
+                <span class="badge badge-inactive">Nessun Evento</span>
+                <h1>Nessuna partita in programma</h1>
+              </div>
               <button disabled class="btn btn-disabled">Nessuno Stream Attivo</button>
             `;
           }
         } catch (calErr) {
-          app.innerHTML = `
-            <span class="badge badge-inactive">Errore Calendario</span>
-            <h1>Errore nel caricamento del calendario</h1>
-            <p>Dettaglio dell'errore:</p>
-            <div class="error-box">${calErr.message}</div>
-            <button disabled class="btn btn-disabled" style="margin-top:15px">Nessuno Stream Attivo</button>
+          app.innerHTML = `<div><span class="badge badge-inactive">Errore Calendario</span><div class="error-box">${calErr.message}</div></div>`;
+        }
+      } catch (err) {
+        app.innerHTML = `<div><span class="badge badge-inactive">Errore Stream</span><div class="error-box">${err.message}</div></div>`;
+      }
+      return { attivo: false };
+    }
+
+    // --- 2. GESTIONE CARD FORMULA 1 ---
+    async function loadF1Card() {
+      const app = document.getElementById('app-f1');
+
+      try {
+        const response = await fetch(`${BASE_URL}f1_stream.json`, { cache: 'no-store' });
+        if (!response.ok) throw new Error(`HTTP ${response.status} caricando f1_stream.json`);
+        const streamData = await response.json();
+
+        const isAttivo = streamData.attivo === true || streamData.attivo === 'true';
+
+        let qualificaInfo = null;
+        let garaInfo = null;
+        let nomeGP = "Gran Premio F1";
+
+        try {
+          const calResponse = await fetch(`${BASE_URL}f1_calendar.json`, { cache: 'no-store' });
+          if (calResponse.ok) {
+            const dataCal = await calResponse.json();
+            const gare = Array.isArray(dataCal) ? dataCal : (dataCal.gare || []);
+            const adesso = new Date();
+
+            const prossimoEventoIndex = gare.findIndex(g => {
+              if (!g || !g.data) return false;
+              const targetDate = new Date(`${g.data}T${g.ora || "15:00"}:00Z`);
+              return !isNaN(targetDate) && targetDate >= (adesso - 3 * 60 * 60 * 1000);
+            });
+
+            if (prossimoEventoIndex !== -1) {
+              const eventoBase = gare[prossimoEventoIndex];
+              nomeGP = (eventoBase.gran_premio || "").split(" - ")[0] || "Gran Premio F1";
+
+              const sessioniGP = gare.filter(g => g.gran_premio && g.gran_premio.startsWith(nomeGP));
+              qualificaInfo = sessioniGP.find(g => g.gran_premio.includes("Qualifiche") || g.gran_premio.includes("Sprint Shootout"));
+              garaInfo = sessioniGP.find(g => g.gran_premio.endsWith("- Gara") || g.gran_premio.includes("Gara Sprint"));
+            }
+          }
+        } catch (e) { console.error("Errore lettura calendario F1", e); }
+
+        const qualData = qualificaInfo ? formatDateTimeIT(qualificaInfo.data, qualificaInfo.ora) : null;
+        const garaData = garaInfo ? formatDateTimeIT(garaInfo.data, garaInfo.ora) : null;
+
+        let badgeHtml = isAttivo 
+          ? '<span class="badge badge-active">🔴 In Diretta F1</span>' 
+          : '<span class="badge badge-next">Prossimo Weekend</span>';
+
+        const adesso = new Date();
+        const qualificaTerminata = qualData && qualData.rawDate && (adesso > (qualData.rawDate.getTime() + 1 * 60 * 60 * 1000));
+        const haRisultatiFerrari = qualificaInfo && qualificaInfo.ferrari_qualy;
+
+        // Determina il target del countdown unico in basso
+        let targetEventoData = null;
+        let etichettaTarget = 'Evento';
+
+        if (qualData && qualData.rawDate && !qualificaTerminata) {
+          targetEventoData = qualData;
+          etichettaTarget = 'Qualifica';
+        } else if (garaData && garaData.rawDate) {
+          targetEventoData = garaData;
+          etichettaTarget = 'Gara';
+        }
+
+        // HTML Colonna Qualifica (mostra box Ferrari se concluse)
+        let qualificaDettagliHtml = '';
+        if (haRisultatiFerrari || qualificaTerminata) {
+          const testoFerrari = haRisultatiFerrari ? qualificaInfo.ferrari_qualy : 'Concluse';
+          qualificaDettagliHtml = `
+            ${qualData ? `<strong>${qualData.data}</strong> (${qualData.ora})` : 'Svolta'}
+            <div style="margin-top: 6px; padding: 4px 6px; background: rgba(220, 38, 38, 0.2); border: 1px solid #dc2626; border-radius: 6px; color: #f87171; font-size: 0.82rem;">
+              <strong>🏎️ ${testoFerrari}</strong>
+            </div>
           `;
+        } else {
+          qualificaDettagliHtml = qualData ? `<strong>${qualData.data}</strong><br>Ore ${qualData.ora}` : 'Data da destinarsi';
+        }
+
+        // Sezione streaming attivo
+        const bottomSectionHtml = isAttivo && streamData.url ? `
+          <div style="margin-top: 15px;">
+            <a href="${streamData.url}" target="_blank" class="btn btn-live">AVVIA STREAMING F1</a>
+            <p class="redirect-note" id="f1-note">
+              Reindirizzamento automatico tra <strong id="f1-cd">3</strong> secondi...
+            </p>
+          </div>
+        ` : '';
+
+        app.innerHTML = `
+          <div>
+            ${badgeHtml}
+            <h1>${nomeGP}</h1>
+
+            <!-- SEZIONE A DUE COLONNE: QUALIFICA E GARA -->
+            <div class="f1-split-container">
+              
+              <!-- COLONNA QUALIFICA -->
+              <div class="f1-col">
+                <div class="f1-col-title"><strong>Qualifica</strong></div>
+                <div class="f1-col-details">
+                  ${qualificaDettagliHtml}
+                </div>
+              </div>
+
+              <!-- COLONNA GARA -->
+              <div class="f1-col">
+                <div class="f1-col-title"><strong>Gara</strong></div>
+                <div class="f1-col-details">
+                  ${garaData ? `<strong>${garaData.data}</strong><br>Ore ${garaData.ora}` : 'Data da destinarsi'}
+                </div>
+              </div>
+
+            </div>
+          </div>
+
+          <!-- UNICO COUNTDOWN IN BASSO UNIFORMATO -->
+          <div>
+            <div class="countdown-box">
+              <span>Inizio ${etichettaTarget} tra:</span>
+              <strong id="f1-match-cd">${targetEventoData ? 'Calcolo...' : '-'}</strong>
+            </div>
+            ${bottomSectionHtml}
+          </div>
+        `;
+
+        if (targetEventoData && targetEventoData.rawDate) {
+          const interval = setInterval(() => {
+            const diff = targetEventoData.rawDate - new Date();
+            const el = document.getElementById('f1-match-cd');
+            if (!el) return clearInterval(interval);
+            if (diff <= 0) { el.textContent = `${etichettaTarget} Iniziata!`; return; }
+            const g = Math.floor(diff / 86400000);
+            const h = Math.floor((diff % 86400000) / 3600000);
+            const m = Math.floor((diff % 3600000) / 60000);
+            const s = Math.floor((diff % 60000) / 1000);
+            el.textContent = `${g > 0 ? g + 'g ' : ''}${h}h ${m}m ${s}s`;
+          }, 1000);
+        }
+
+        if (isAttivo && streamData.url) {
+          return { attivo: true, url: streamData.url, countdownPrefix: 'f1' };
         }
 
       } catch (err) {
-        app.innerHTML = `
-          <span class="badge badge-inactive">Errore Stream</span>
-          <h1>Impossibile caricare i dati dello stream</h1>
-          <div class="error-box">${err.message}</div>
-        `;
-      } finally {
-        // Garantisce sempre la chiusura dello splash screen
-        hideSplashScreen(startTime);
+        app.innerHTML = `<div><span class="badge badge-inactive">Errore F1</span><div class="error-box">${err.message}</div></div>`;
+      }
+
+      return { attivo: false };
+    }
+    
+    // --- INITIALIZATION ENGINE ---
+    async function init() {
+      const startTime = Date.now();
+
+      const results = await Promise.allSettled([
+        loadInterCard(),
+        loadF1Card()
+      ]);
+
+      hideSplashScreen(startTime);
+
+      const activeStreams = results
+        .filter(r => r.status === 'fulfilled' && r.value && r.value.attivo)
+        .map(r => r.value);
+
+      // Gestione reindirizzamento
+      if (activeStreams.length > 1) {
+        activeStreams.forEach(s => {
+          const noteEl = document.getElementById(`${s.countdownPrefix}-note`);
+          if (noteEl) {
+            noteEl.innerHTML = `⚠️ <strong>Entrambi gli eventi in diretta!</strong> Seleziona manualmente lo streaming.`;
+          }
+        });
+      } else if (activeStreams.length === 1) {
+        const stream = activeStreams[0];
+        let secondiRimanenti = 3;
+
+        const timerEl = document.getElementById(`${stream.countdownPrefix}-cd`);
+        const interval = setInterval(() => {
+          secondiRimanenti--;
+          if (timerEl) timerEl.textContent = secondiRimanenti;
+          
+          if (secondiRimanenti <= 0) {
+            clearInterval(interval);
+            window.location.href = stream.url;
+          }
+        }, 1000);
       }
     }
 
-    checkMatch();
+    init();
   </script>
 </body>
 </html>
