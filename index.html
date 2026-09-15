@@ -418,7 +418,7 @@
     }
 
     // --- 2. GESTIONE CARD FORMULA 1 (LAYOUT 2/3 DIVISI + 1/3 BOTTONE) ---
-    async function loadF1Card() {
+  async function loadF1Card() {
       const app = document.getElementById('app-f1');
 
       try {
@@ -428,7 +428,6 @@
 
         const isAttivo = streamData.attivo === true || streamData.attivo === 'true';
 
-        // Carichiamo il calendario F1 per estrarre il prossimo weekend di GP
         let qualificaInfo = null;
         let garaInfo = null;
         let nomeGP = "Gran Premio F1";
@@ -440,7 +439,6 @@
             const gare = Array.isArray(dataCal) ? dataCal : (dataCal.gare || []);
             const adesso = new Date();
 
-            // Troviamo la prima sessione attiva o futura
             const prossimoEventoIndex = gare.findIndex(g => {
               if (!g || !g.data) return false;
               const targetDate = new Date(`${g.data}T${g.ora || "15:00"}:00Z`);
@@ -451,7 +449,6 @@
               const eventoBase = gare[prossimoEventoIndex];
               nomeGP = (eventoBase.gran_premio || "").split(" - ")[0] || "Gran Premio F1";
 
-              // Trova qualifica e gara dello stesso Gran Premio
               const sessioniGP = gare.filter(g => g.gran_premio && g.gran_premio.startsWith(nomeGP));
               qualificaInfo = sessioniGP.find(g => g.gran_premio.includes("Qualifiche") || g.gran_premio.includes("Sprint Shootout"));
               garaInfo = sessioniGP.find(g => g.gran_premio.endsWith("- Gara") || g.gran_premio.includes("Gara Sprint"));
@@ -459,64 +456,81 @@
           }
         } catch (e) { console.error("Errore lettura calendario F1", e); }
 
-        // Formattazione Qualifica e Gara
         const qualData = qualificaInfo ? formatDateTimeIT(qualificaInfo.data, qualificaInfo.ora) : null;
         const garaData = garaInfo ? formatDateTimeIT(garaInfo.data, garaInfo.ora) : null;
 
-        // Badge di Stato
-        let badgeHtml = '<span class="badge badge-next">Prossimo Weekend</span>';
-        if (isAttivo) {
-          badgeHtml = '<span class="badge badge-active">🔴 In Diretta F1</span>';
+        let badgeHtml = isAttivo 
+          ? '<span class="badge badge-active">🔴 In Diretta F1</span>' 
+          : '<span class="badge badge-next">Prossimo Weekend</span>';
+
+        // Verifica se la qualifica è conclusa
+        const adesso = new Date();
+        const qualificaTerminata = qualData && qualData.rawDate && (adesso > (qualData.rawDate.getTime() + 60 * 60 * 1000));
+        const haRisultatiFerrari = qualificaInfo && qualificaInfo.ferrari_qualy;
+
+        // Box Qualifiche: Risultati Ferrari se conclusa, altrimenti Countdown
+        let qualificaBoxHtml = '';
+        if (haRisultatiFerrari || qualificaTerminata) {
+          const testoFerrari = haRisultatiFerrari ? qualificaInfo.ferrari_qualy : 'Qualifiche Concluse';
+          qualificaBoxHtml = `
+            <div class="countdown-box" style="background: rgba(220, 38, 38, 0.15); border-color: #dc2626; padding: 12px 8px;">
+              <span style="color: #f87171; font-weight: 700; font-size: 0.85rem;">🏎️ Ferrari</span><br>
+              <strong style="color: #ffffff; font-size: 0.95rem;">${testoFerrari}</strong>
+            </div>
+          `;
+        } else {
+          qualificaBoxHtml = `
+            <div class="countdown-box" style="padding: 12px 8px;">
+              <strong id="f1-qual-cd">${qualData ? 'Calcolo...' : '-'}</strong>
+            </div>
+          `;
         }
 
-        // COSTRUZIONE LAYOUT RISPETTANDO LO SCHEMA GRAFICO
-        app.innerHTML = `
-          <div>
-            ${badgeHtml}
-            <h1>${nomeGP}</h1>
-
-            <!-- 2/3 SUPERIORI DIVISI VERTICALMENTE IN DUE METÀ -->
-            <div class="f1-split-container">
-              
-              <!-- COLONNA SINISTRA: QUALIFICA -->
-              <div class="f1-col">
-                <div class="f1-col-title">⏱️ Qualifica</div>
-                <div class="f1-col-details">
-                  ${qualData ? `<strong>${qualData.data}</strong><br>Ore ${qualData.ora}` : 'Data da destinarsi'}
-                </div>
-                <div class="countdown-box">
-                  <strong id="f1-qual-cd">${qualData ? 'Calcolo...' : '-'}</strong>
-                </div>
-              </div>
-
-              <!-- COLONNA DESTRA: GARA -->
-              <div class="f1-col">
-                <div class="f1-col-title">🏎️ Gara</div>
-                <div class="f1-col-details">
-                  ${garaData ? `<strong>${garaData.data}</strong><br>Ore ${garaData.ora}` : 'Data da destinarsi'}
-                </div>
-                <div class="countdown-box">
-                  <strong id="f1-gara-cd">${garaData ? 'Calcolo...' : '-'}</strong>
-                </div>
-              </div>
-
-            </div>
+        // Se lo stream NON è attivo, la sezione bottone viene totalmente OMESSA
+        const bottomSectionHtml = isAttivo && streamData.url ? `
+          <div class="f1-bottom-section" style="margin-top: 15px;">
+            <a href="${streamData.url}" target="_blank" class="btn btn-live">AVVIA LO STREAMING F1</a>
+            <p class="redirect-note" id="f1-note">
+              Reindirizzamento automatico tra <strong id="f1-cd">3</strong> secondi...
+            </p>
           </div>
+        ` : '';
 
-          <!-- 1/3 INFERIORE UNIFICATO CON IL BOTTONE STREAMING -->
-          <div class="f1-bottom-section">
-            ${isAttivo && streamData.url ? `
-              <a href="${streamData.url}" target="_blank" class="btn btn-live">AVVIA LO STREAMING F1</a>
-              <p class="redirect-note" id="f1-note">
-                Reindirizzamento automatico tra <strong id="f1-cd">3</strong> secondi...
-              </p>
-            ` : `
-              <button disabled class="btn btn-disabled">Nessuno Stream F1 Attivo</button>
-            `}
+        app.innerHTML = `
+          <div style="display: flex; flex-direction: column; height: 100%; justify-content: space-between;">
+            <div>
+              ${badgeHtml}
+              <h1 style="margin-bottom: 20px;">${nomeGP}</h1>
+
+              <div class="f1-split-container">
+                
+                <!-- COLONNA QUALIFICA -->
+                <div class="f1-col">
+                  <div class="f1-col-title">⏱️ Qualifica</div>
+                  <div class="f1-col-details" style="margin-bottom: 12px;">
+                    ${qualData ? `<strong>${qualData.data}</strong><br>Ore ${qualData.ora}` : 'Data da destinarsi'}
+                  </div>
+                  ${qualificaBoxHtml}
+                </div>
+
+                <!-- COLONNA GARA -->
+                <div class="f1-col">
+                  <div class="f1-col-title">🏎️ Gara</div>
+                  <div class="f1-col-details" style="margin-bottom: 12px;">
+                    ${garaData ? `<strong>${garaData.data}</strong><br>Ore ${garaData.ora}` : 'Data da destinarsi'}
+                  </div>
+                  <div class="countdown-box" style="padding: 12px 8px;">
+                    <strong id="f1-gara-cd">${garaData ? 'Calcolo...' : '-'}</strong>
+                  </div>
+                </div>
+
+              </div>
+            </div>
+
+            ${bottomSectionHtml}
           </div>
         `;
 
-        // Avvio dei due timer indipendenti per Qualifica e Gara
         function setupTimer(targetDt, elementId, labelTerminato) {
           if (!targetDt) return;
           const interval = setInterval(() => {
@@ -532,7 +546,9 @@
           }, 1000);
         }
 
-        if (qualData && qualData.rawDate) setupTimer(qualData.rawDate, 'f1-qual-cd', 'Qualifica Iniziata!');
+        if (!haRisultatiFerrari && !qualificaTerminata && qualData && qualData.rawDate) {
+          setupTimer(qualData.rawDate, 'f1-qual-cd', 'Qualifica Iniziata!');
+        }
         if (garaData && garaData.rawDate) setupTimer(garaData.rawDate, 'f1-gara-cd', 'Gara Iniziata!');
 
         if (isAttivo && streamData.url) {
@@ -545,7 +561,7 @@
 
       return { attivo: false };
     }
-
+    
     // --- INITIALIZATION ENGINE ---
     async function init() {
       const startTime = Date.now();
