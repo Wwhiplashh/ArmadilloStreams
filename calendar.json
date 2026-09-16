@@ -13,7 +13,7 @@
   },
   {
     "data": "2026-10-10",
-    "ora": "13:00",
+    "ora": "16:00",
     "partita": "Inter vs Parma",
     "home_team": "Inter",
     "away_team": "Parma",
@@ -153,6 +153,18 @@
     "away_logo": "https://api.sofascore.app/api/v1/team/2713/image",
     "competizione": "Serie A",
     "servizio": "DAZN",
+    "url": ""
+  },
+  {
+    "data": "2026-12-02",
+    "ora": "13:00",
+    "partita": "Inter vs Genoa",
+    "home_team": "Inter",
+    "away_team": "Genoa",
+    "home_logo": "https://api.sofascore.app/api/v1/team/2697/image",
+    "away_logo": "https://api.sofascore.app/api/v1/team/2713/image",
+    "competizione": "Coppa Italia",
+    "servizio": "Mediaset",
     "url": ""
   },
   {
@@ -343,18 +355,6 @@
     "away_team": "Atalanta",
     "home_logo": "https://api.sofascore.app/api/v1/team/2697/image",
     "away_logo": "https://api.sofascore.app/api/v1/team/2686/image",
-    "competizione": "Serie A",
-    "servizio": "DAZN",
-    "url": ""
-  },
-  {
-    "data": "2027-03-06",
-    "ora": "13:00",
-    "partita": "Udinese vs Inter",
-    "home_team": "Udinese",
-    "away_team": "Inter",
-    "home_logo": "https://api.sofascore.app/api/v1/team/2695/image",
-    "away_logo": "https://api.sofascore.app/api/v1/team/2697/image",
     "competizione": "Serie A",
     "servizio": "DAZN",
     "url": ""

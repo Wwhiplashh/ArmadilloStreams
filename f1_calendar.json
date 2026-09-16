@@ -5,7 +5,8 @@
       "ora": "05:00",
       "gran_premio": "GP d'Australia - Qualifiche",
       "competizione": "Formula 1",
-      "servizio": "Sky Sport F1 / NOW"
+      "servizio": "Sky Sport F1 / NOW",
+      "ferrari_qualy": "LEC P4 | HAM P7"
     },
     {
       "data": "2026-03-08",
@@ -15,25 +16,12 @@
       "servizio": "Sky Sport F1 / NOW"
     },
     {
-      "data": "2026-03-13",
-      "ora": "07:30",
-      "gran_premio": "GP della Cina - Qualifiche Sprint",
-      "competizione": "Formula 1",
-      "servizio": "Sky Sport F1 / NOW"
-    },
-    {
-      "data": "2026-03-14",
-      "ora": "03:00",
-      "gran_premio": "GP della Cina - Gara Sprint",
-      "competizione": "Formula 1",
-      "servizio": "Sky Sport F1 / NOW"
-    },
-    {
       "data": "2026-03-14",
       "ora": "07:00",
       "gran_premio": "GP della Cina - Qualifiche",
       "competizione": "Formula 1",
-      "servizio": "Sky Sport F1 / NOW"
+      "servizio": "Sky Sport F1 / NOW",
+      "ferrari_qualy": "HAM P3 | LEC P4"
     },
     {
       "data": "2026-03-15",
@@ -47,7 +35,8 @@
       "ora": "06:00",
       "gran_premio": "GP del Giappone - Qualifiche",
       "competizione": "Formula 1",
-      "servizio": "Sky Sport F1 / NOW"
+      "servizio": "Sky Sport F1 / NOW",
+      "ferrari_qualy": "LEC P4 | HAM P6"
     },
     {
       "data": "2026-03-29",
@@ -57,25 +46,12 @@
       "servizio": "Sky Sport F1 / NOW"
     },
     {
-      "data": "2026-05-01",
-      "ora": "20:30",
-      "gran_premio": "GP di Miami - Qualifiche Sprint",
-      "competizione": "Formula 1",
-      "servizio": "Sky Sport F1 / NOW"
-    },
-    {
-      "data": "2026-05-02",
-      "ora": "16:00",
-      "gran_premio": "GP di Miami - Gara Sprint",
-      "competizione": "Formula 1",
-      "servizio": "Sky Sport F1 / NOW"
-    },
-    {
       "data": "2026-05-02",
       "ora": "20:00",
       "gran_premio": "GP di Miami - Qualifiche",
       "competizione": "Formula 1",
-      "servizio": "Sky Sport F1 / NOW"
+      "servizio": "Sky Sport F1 / NOW",
+      "ferrari_qualy": "LEC P3 | HAM P6"
     },
     {
       "data": "2026-05-03",
@@ -85,25 +61,12 @@
       "servizio": "Sky Sport F1 / NOW"
     },
     {
-      "data": "2026-05-22",
-      "ora": "20:30",
-      "gran_premio": "GP del Canada - Qualifiche Sprint",
-      "competizione": "Formula 1",
-      "servizio": "Sky Sport F1 / NOW"
-    },
-    {
-      "data": "2026-05-23",
-      "ora": "16:00",
-      "gran_premio": "GP del Canada - Gara Sprint",
-      "competizione": "Formula 1",
-      "servizio": "Sky Sport F1 / NOW"
-    },
-    {
       "data": "2026-05-23",
       "ora": "20:00",
       "gran_premio": "GP del Canada - Qualifiche",
       "competizione": "Formula 1",
-      "servizio": "Sky Sport F1 / NOW"
+      "servizio": "Sky Sport F1 / NOW",
+      "ferrari_qualy": "HAM P5 | LEC P8"
     },
     {
       "data": "2026-05-24",
@@ -155,20 +118,6 @@
       "servizio": "Sky Sport F1 / NOW"
     },
     {
-      "data": "2026-07-03",
-      "ora": "15:30",
-      "gran_premio": "GP di Gran Bretagna (Silverstone) - Qualifiche Sprint",
-      "competizione": "Formula 1",
-      "servizio": "Sky Sport F1 / NOW"
-    },
-    {
-      "data": "2026-07-04",
-      "ora": "11:00",
-      "gran_premio": "GP di Gran Bretagna (Silverstone) - Gara Sprint",
-      "competizione": "Formula 1",
-      "servizio": "Sky Sport F1 / NOW"
-    },
-    {
       "data": "2026-07-04",
       "ora": "15:00",
       "gran_premio": "GP di Gran Bretagna (Silverstone) - Qualifiche",
@@ -207,20 +156,6 @@
       "data": "2026-07-26",
       "ora": "13:00",
       "gran_premio": "GP d'Ungheria - Gara",
-      "competizione": "Formula 1",
-      "servizio": "Sky Sport F1 / NOW"
-    },
-    {
-      "data": "2026-08-21",
-      "ora": "14:30",
-      "gran_premio": "GP d'Olanda (Zandvoort) - Qualifiche Sprint",
-      "competizione": "Formula 1",
-      "servizio": "Sky Sport F1 / NOW"
-    },
-    {
-      "data": "2026-08-22",
-      "ora": "10:00",
-      "gran_premio": "GP d'Olanda (Zandvoort) - Gara Sprint",
       "competizione": "Formula 1",
       "servizio": "Sky Sport F1 / NOW"
     },
@@ -291,20 +226,6 @@
       "data": "2026-10-04",
       "ora": "07:00",
       "gran_premio": "Bahrain GP in Malaysia - Gara",
-      "competizione": "Formula 1",
-      "servizio": "Sky Sport F1 / NOW"
-    },
-    {
-      "data": "2026-10-09",
-      "ora": "12:30",
-      "gran_premio": "GP di Singapore - Qualifiche Sprint",
-      "competizione": "Formula 1",
-      "servizio": "Sky Sport F1 / NOW"
-    },
-    {
-      "data": "2026-10-10",
-      "ora": "09:00",
-      "gran_premio": "GP di Singapore - Gara Sprint",
       "competizione": "Formula 1",
       "servizio": "Sky Sport F1 / NOW"
     },
