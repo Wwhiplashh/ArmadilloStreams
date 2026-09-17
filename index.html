@@ -12,44 +12,18 @@
   <link rel="manifest" href="manifest.json">
 
   <!-- Google Fonts -->
-  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700&display=swap" rel="stylesheet">
   <style>
-    :root {
-      --bg-main: #f8fafc;
-      --card-bg: #ffffff;
-      --card-border: #e2e8f0;
-      --text-main: #0f172a;
-      --text-muted: #64748b;
-      
-      /* Colori estratti dal logo */
-      --brand-gold: #e5a91a;
-      --brand-gold-hover: #d99b0d;
-      --brand-gold-soft: rgba(229, 169, 26, 0.12);
-      --brand-red: #991b1b; /* Rosso dell'occhio del logo */
-      
-      --accent-inter: #0284c7;
-      --accent-inter-soft: rgba(2, 132, 199, 0.12);
-      --accent-f1: #dc2626;
-      --accent-f1-soft: rgba(220, 38, 38, 0.12);
-      --accent-live: #16a34a;
-      --accent-live-soft: rgba(22, 163, 74, 0.12);
-    }
-
     * { box-sizing: border-box; margin: 0; padding: 0; }
-    
     body {
-      font-family: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, sans-serif;
-      background-color: var(--bg-main);
-      background-image: 
-        radial-gradient(at 10% 10%, rgba(229, 169, 26, 0.08) 0px, transparent 40%),
-        radial-gradient(at 90% 90%, rgba(2, 132, 199, 0.05) 0px, transparent 40%);
-      background-attachment: fixed;
-      color: var(--text-main);
+      font-family: 'Poppins', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+      background: #f8fafc;
+      color: #0f172a;
       min-height: 100vh;
       display: flex;
       justify-content: center;
       align-items: center;
-      padding: 24px;
+      padding: 20px;
     }
 
     /* Splash Screen */
@@ -70,36 +44,31 @@
       pointer-events: none;
     }
     .splash-logo {
-      width: 260px;
-      max-width: 70vw;
+      width: 320px;
+      max-width: 80vw;
       height: auto;
-      animation: logoPulse 1.8s infinite alternate ease-in-out;
-    }
-
-    @keyframes logoPulse {
-      0% { transform: scale(0.96); opacity: 0.9; }
-      100% { transform: scale(1.02); opacity: 1; }
+      object-fit: contain;
     }
 
     .container {
       width: 100%;
-      max-width: 920px;
+      max-width: 900px;
       margin: 0 auto;
     }
 
-    /* Card Principale (Hero / Diretta) */
+    /* Evento in diretta / Overlay Banner */
     .hero-card {
-      background: var(--card-bg);
-      border: 1px solid var(--card-border);
-      border-top: 4px solid var(--brand-gold);
-      box-shadow: 0 20px 40px -15px rgba(15, 23, 42, 0.07);
-      border-radius: 20px;
-      padding: 36px 28px;
+      background: #ffffff;
+      border: 1px solid #e2e8f0;
+      border-top: 4px solid #e5a91a;
+      box-shadow: 0 10px 30px rgba(15, 23, 42, 0.06);
+      border-radius: 16px;
+      padding: 30px;
       text-align: center;
-      margin-bottom: 24px;
+      margin-bottom: 25px;
     }
 
-    /* Griglia per i due eventi futuri */
+    /* Griglia per i due eventi futuri (Inter e F1) */
     .events-grid {
       display: grid;
       grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
@@ -108,85 +77,56 @@
     }
 
     .card {
-      background: var(--card-bg);
-      border: 1px solid var(--card-border);
-      box-shadow: 0 10px 30px -10px rgba(15, 23, 42, 0.05);
-      border-radius: 20px;
-      padding: 28px 24px;
+      background: #ffffff;
+      border: 1px solid #e2e8f0;
+      box-shadow: 0 8px 24px rgba(15, 23, 42, 0.04);
+      border-radius: 16px;
+      padding: 25px;
       text-align: center;
       display: flex;
       flex-direction: column;
       justify-content: space-between;
-      transition: all 0.25s ease;
-    }
-    
-    .card:hover {
-      transform: translateY(-3px);
-      border-color: var(--brand-gold);
-      box-shadow: 0 15px 35px -10px rgba(229, 169, 26, 0.15);
     }
 
     .badge {
-      display: inline-flex;
-      align-items: center;
-      gap: 6px;
-      padding: 6px 14px;
-      border-radius: 100px;
-      font-size: 0.75rem;
-      font-weight: 800;
+      display: inline-block;
+      padding: 5px 12px;
+      border-radius: 20px;
+      font-size: 0.8rem;
+      font-weight: 700;
       text-transform: uppercase;
-      margin-bottom: 18px;
-      letter-spacing: 0.8px;
+      margin-bottom: 15px;
+      letter-spacing: 0.5px;
       align-self: center;
     }
+    .badge-active { background: rgba(22, 163, 74, 0.12); color: #16a34a; border: 1px solid rgba(22, 163, 74, 0.2); }
+    .badge-next { background: rgba(229, 169, 26, 0.15); color: #b47800; border: 1px solid rgba(229, 169, 26, 0.3); }
+    .badge-inactive { background: #f1f5f9; color: #64748b; border: 1px solid #e2e8f0; }
+    .badge-overlap { background: rgba(153, 27, 27, 0.1); color: #991b1b; border: 1px solid rgba(153, 27, 27, 0.2); }
     
-    .badge-active { 
-      background: var(--accent-live-soft); 
-      color: var(--accent-live); 
-      border: 1px solid rgba(22, 163, 74, 0.2);
-    }
-    .badge-next { 
-      background: var(--brand-gold-soft); 
-      color: #b47800; 
-      border: 1px solid rgba(229, 169, 26, 0.3);
-    }
-    .badge-inactive { 
-      background: #f1f5f9; 
-      color: var(--text-muted); 
-      border: 1px solid #e2e8f0;
-    }
-    .badge-overlap { 
-      background: rgba(217, 119, 6, 0.12); 
-      color: #d97706; 
-      border: 1px solid rgba(217, 119, 6, 0.2);
-    }
-    
-    h1 { font-size: 1.65rem; font-weight: 800; margin-bottom: 12px; color: var(--text-main); }
-    h2 { font-size: 1.35rem; font-weight: 700; margin-bottom: 12px; color: var(--text-main); }
-    p { color: var(--text-muted); font-size: 0.92rem; line-height: 1.6; margin-bottom: 18px; }
+    h1 { font-size: 1.5rem; font-weight: 700; margin-bottom: 10px; color: #0f172a; }
+    h2 { font-size: 1.3rem; font-weight: 700; margin-bottom: 10px; color: #0f172a; }
+    p { color: #64748b; font-size: 0.9rem; line-height: 1.5; margin-bottom: 15px; }
     
     .redirect-note {
       font-size: 0.85rem;
-      margin-top: 16px;
-      color: var(--text-muted);
+      margin-top: 15px;
+      color: #64748b;
     }
-    .redirect-note strong { color: var(--brand-gold); }
+    .redirect-note strong { color: #e5a91a; }
     
     .countdown-box {
       background: #f8fafc;
       border: 1px solid #e2e8f0;
-      padding: 14px;
-      border-radius: 14px;
-      font-size: 0.82rem;
-      color: var(--text-muted);
-      margin-top: 12px;
-      text-transform: uppercase;
-      letter-spacing: 0.5px;
+      padding: 12px;
+      border-radius: 10px;
+      font-size: 0.85rem;
+      color: #64748b;
+      margin-top: 10px;
     }
     .countdown-box strong {
-      color: var(--text-main);
-      font-size: 1.15rem;
-      font-weight: 800;
+      color: #0f172a;
+      font-size: 1.05rem;
       letter-spacing: 0.5px;
       display: block;
       margin-top: 4px;
@@ -195,26 +135,26 @@
     .error-box { 
       background: rgba(220, 38, 38, 0.08); 
       border: 1px solid rgba(220, 38, 38, 0.2); 
-      padding: 12px; 
-      border-radius: 12px; 
+      padding: 10px; 
+      border-radius: 8px; 
       font-family: monospace; 
-      font-size: 0.82rem; 
+      font-size: 0.8rem; 
       color: #991b1b; 
-      margin-top: 12px; 
+      margin-top: 10px; 
       text-align: left; 
     }
     
     .btn-container {
       display: flex;
       flex-direction: column;
-      gap: 12px;
-      margin-top: 18px;
+      gap: 10px;
+      margin-top: 15px;
     }
     .btn {
       display: block;
       width: 100%;
-      padding: 14px 20px;
-      border-radius: 12px;
+      padding: 12px 18px;
+      border-radius: 10px;
       font-size: 0.95rem;
       font-weight: 700;
       text-decoration: none;
@@ -222,38 +162,13 @@
       border: none;
       cursor: pointer;
       text-align: center;
-      letter-spacing: 0.2px;
     }
-    
-    .btn-live { 
-      background: var(--accent-live); 
-      color: #ffffff; 
-      box-shadow: 0 4px 15px rgba(22, 163, 74, 0.25); 
-    }
-    .btn-live:hover { 
-      background: #15803d; 
-      transform: translateY(-1px);
-    }
-    
-    .btn-inter { 
-      background: var(--accent-inter); 
-      color: #ffffff; 
-      box-shadow: 0 4px 15px rgba(2, 132, 199, 0.25); 
-    }
-    .btn-inter:hover { 
-      background: #0369a1; 
-      transform: translateY(-1px);
-    }
-    
-    .btn-f1 { 
-      background: var(--brand-red); 
-      color: #ffffff; 
-      box-shadow: 0 4px 15px rgba(153, 27, 27, 0.25); 
-    }
-    .btn-f1:hover { 
-      background: #7f1d1d; 
-      transform: translateY(-1px);
-    }
+    .btn-live { background: #e5a91a; color: #ffffff; box-shadow: 0 4px 14px rgba(229, 169, 26, 0.3); }
+    .btn-live:hover { background: #d99b0d; }
+    .btn-inter { background: #0284c7; color: #ffffff; box-shadow: 0 4px 14px rgba(2, 132, 199, 0.3); }
+    .btn-inter:hover { background: #0369a1; }
+    .btn-f1 { background: #991b1b; color: #ffffff; box-shadow: 0 4px 14px rgba(153, 27, 27, 0.3); }
+    .btn-f1:hover { background: #7f1d1d; }
   </style>
 </head>
 <body>
@@ -265,7 +180,7 @@
 
   <div class="container" id="app">
     <div class="hero-card">
-      <span class="badge badge-next">Verifica in corso</span>
+      <span class="badge badge-next">Verifica in corso...</span>
       <h1>Connessione al server...</h1>
     </div>
   </div>
@@ -289,6 +204,7 @@
       }, 300);
     }
 
+    // Converte data e ora in oggetto Date UTC valido
     function parseUTCDate(dataStr, oraStr) {
       if (!dataStr) return null;
       
@@ -311,6 +227,7 @@
       return isNaN(dateObj.getTime()) ? null : dateObj;
     }
 
+    // Verifica se l'evento è attivo E siamo nella finestra temporale corretta (ultimi 5 min o in corso)
     function isEventoLive(evento) {
       if (!evento || !evento.attivo || !evento.url || evento.in_chiaro) return false;
       
@@ -536,7 +453,7 @@
         const diff = evento.targetDate - adesso;
 
         if (diff <= 0) {
-          timerEl.innerHTML = '<span style="color: #0284c7;">🔴 In attesa di segnale streaming...</span>';
+          timerEl.innerHTML = '<span style="color: #0284c7;">🔴 Evento iniziato (In attesa di segnale)...</span>';
           return;
         }
 
