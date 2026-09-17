@@ -283,9 +283,9 @@
 
       const dataRaw = targetDate.toLocaleDateString('it-IT', {
         timeZone: 'Europe/Rome',
-        weekday: 'short',
+        weekday: 'long',
         day: 'numeric',
-        month: 'short'
+        month: 'long'
       });
       const dataFormattata = dataRaw.charAt(0).toUpperCase() + dataRaw.slice(1);
 
