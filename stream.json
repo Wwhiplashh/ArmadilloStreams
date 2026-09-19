@@ -1,14 +1,14 @@
 {
-  "attivo": false,
+  "attivo": true,
   "in_chiaro": false,
-  "data": "2026-09-18",
-  "ora": null,
-  "partita": null,
-  "home_team": null,
-  "away_team": null,
-  "home_logo": null,
-  "away_logo": null,
-  "competizione": null,
-  "servizio": null,
-  "url": ""
+  "data": "2026-09-19",
+  "ora": "18:00",
+  "partita": "AS Roma vs Inter",
+  "home_team": "AS Roma",
+  "away_team": "Inter",
+  "home_logo": "https://api.sofascore.app/api/v1/team/2702/image",
+  "away_logo": "https://api.sofascore.app/api/v1/team/2697/image",
+  "competizione": "Serie A",
+  "servizio": "DAZN",
+  "url": "https://dlhd.pk/watch.php?id=877"
 }
