@@ -133,7 +133,7 @@
   },
   {
     "data": "2026-11-28",
-    "ora": "13:00",
+    "ora": "19:45",
     "partita": "Inter vs Genoa",
     "home_team": "Inter",
     "away_team": "Genoa",
@@ -157,7 +157,7 @@
   },
   {
     "data": "2026-12-05",
-    "ora": "13:00",
+    "ora": "17:00",
     "partita": "Frosinone vs Inter",
     "home_team": "Frosinone",
     "away_team": "Inter",
@@ -204,8 +204,8 @@
     "url": ""
   },
   {
-    "data": "2027-01-02",
-    "ora": "13:00",
+    "data": "2027-01-03",
+    "ora": "11:30",
     "partita": "Inter vs Sassuolo",
     "home_team": "Inter",
     "away_team": "Sassuolo",
