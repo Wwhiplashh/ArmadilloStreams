@@ -1,14 +1,14 @@
 {
-  "attivo": false,
+  "attivo": true,
   "in_chiaro": false,
-  "data": "2026-10-12",
-  "ora": null,
-  "partita": null,
-  "home_team": null,
-  "away_team": null,
-  "home_logo": null,
-  "away_logo": null,
-  "competizione": null,
-  "servizio": null,
-  "url": ""
+  "data": "2026-10-13",
+  "ora": "21:00",
+  "partita": "Inter vs Club Brugge KV",
+  "home_team": "Inter",
+  "away_team": "Club Brugge KV",
+  "home_logo": "https://api.sofascore.app/api/v1/team/2697/image",
+  "away_logo": "https://api.sofascore.app/api/v1/team/2888/image",
+  "competizione": "UEFA Champions League",
+  "servizio": "Sky Sport Uno",
+  "url": "https://dlhd.pk/watch.php?id=461"
 }
