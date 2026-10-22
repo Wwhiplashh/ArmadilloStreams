@@ -1,17 +1,5 @@
 [
   {
-    "data": "2026-10-21",
-    "ora": "19:00",
-    "partita": "Inter vs Shakhtar Donetsk",
-    "home_team": "Inter",
-    "away_team": "Shakhtar Donetsk",
-    "home_logo": "https://api.sofascore.app/api/v1/team/2697/image",
-    "away_logo": "https://api.sofascore.app/api/v1/team/3313/image",
-    "competizione": "UEFA Champions League",
-    "servizio": "Prime Video",
-    "url": ""
-  },
-  {
     "data": "2026-10-25",
     "ora": "11:30",
     "partita": "Inter vs Fiorentina",
@@ -355,6 +343,18 @@
     "away_team": "Frosinone",
     "home_logo": "https://api.sofascore.app/api/v1/team/2697/image",
     "away_logo": "https://api.sofascore.app/api/v1/team/2801/image",
+    "competizione": "Serie A",
+    "servizio": "DAZN",
+    "url": ""
+  },
+  {
+    "data": "2027-04-03",
+    "ora": "13:00",
+    "partita": "Genoa vs Inter",
+    "home_team": "Genoa",
+    "away_team": "Inter",
+    "home_logo": "https://api.sofascore.app/api/v1/team/2713/image",
+    "away_logo": "https://api.sofascore.app/api/v1/team/2697/image",
     "competizione": "Serie A",
     "servizio": "DAZN",
     "url": ""
