@@ -1,17 +1,5 @@
 [
   {
-    "data": "2026-10-28",
-    "ora": "17:30",
-    "partita": "Venezia vs Inter",
-    "home_team": "Venezia",
-    "away_team": "Inter",
-    "home_logo": "https://api.sofascore.app/api/v1/team/2688/image",
-    "away_logo": "https://api.sofascore.app/api/v1/team/2697/image",
-    "competizione": "Serie A",
-    "servizio": "DAZN",
-    "url": ""
-  },
-  {
     "data": "2026-10-31",
     "ora": "19:45",
     "partita": "AC Milan vs Inter",
@@ -355,6 +343,18 @@
     "away_team": "AS Roma",
     "home_logo": "https://api.sofascore.app/api/v1/team/2697/image",
     "away_logo": "https://api.sofascore.app/api/v1/team/2702/image",
+    "competizione": "Serie A",
+    "servizio": "DAZN",
+    "url": ""
+  },
+  {
+    "data": "2027-04-17",
+    "ora": "13:00",
+    "partita": "Monza vs Inter",
+    "home_team": "Monza",
+    "away_team": "Inter",
+    "home_logo": "https://api.sofascore.app/api/v1/team/2729/image",
+    "away_logo": "https://api.sofascore.app/api/v1/team/2697/image",
     "competizione": "Serie A",
     "servizio": "DAZN",
     "url": ""
