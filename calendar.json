@@ -1,17 +1,5 @@
 [
   {
-    "data": "2026-11-03",
-    "ora": "20:00",
-    "partita": "Feyenoord vs Inter",
-    "home_team": "Feyenoord",
-    "away_team": "Inter",
-    "home_logo": "https://api.sofascore.app/api/v1/team/2959/image",
-    "away_logo": "https://api.sofascore.app/api/v1/team/2697/image",
-    "competizione": "UEFA Champions League",
-    "servizio": "Sky Sport Uno",
-    "url": ""
-  },
-  {
     "data": "2026-11-08",
     "ora": "17:00",
     "partita": "Inter vs Como",
@@ -355,6 +343,18 @@
     "away_team": "Bologna",
     "home_logo": "https://api.sofascore.app/api/v1/team/2697/image",
     "away_logo": "https://api.sofascore.app/api/v1/team/2685/image",
+    "competizione": "Serie A",
+    "servizio": "DAZN",
+    "url": ""
+  },
+  {
+    "data": "2027-05-01",
+    "ora": "13:00",
+    "partita": "Como vs Inter",
+    "home_team": "Como",
+    "away_team": "Inter",
+    "home_logo": "https://api.sofascore.app/api/v1/team/2704/image",
+    "away_logo": "https://api.sofascore.app/api/v1/team/2697/image",
     "competizione": "Serie A",
     "servizio": "DAZN",
     "url": ""
