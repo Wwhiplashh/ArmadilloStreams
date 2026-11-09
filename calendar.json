@@ -1,17 +1,5 @@
 [
   {
-    "data": "2026-11-08",
-    "ora": "17:00",
-    "partita": "Inter vs Como",
-    "home_team": "Inter",
-    "away_team": "Como",
-    "home_logo": "https://api.sofascore.app/api/v1/team/2697/image",
-    "away_logo": "https://api.sofascore.app/api/v1/team/2704/image",
-    "competizione": "Serie A",
-    "servizio": "DAZN",
-    "url": ""
-  },
-  {
     "data": "2026-11-22",
     "ora": "19:45",
     "partita": "Atalanta vs Inter",
@@ -355,6 +343,18 @@
     "away_team": "Inter",
     "home_logo": "https://api.sofascore.app/api/v1/team/2704/image",
     "away_logo": "https://api.sofascore.app/api/v1/team/2697/image",
+    "competizione": "Serie A",
+    "servizio": "DAZN",
+    "url": ""
+  },
+  {
+    "data": "2027-05-09",
+    "ora": "13:00",
+    "partita": "Inter vs Lecce",
+    "home_team": "Inter",
+    "away_team": "Lecce",
+    "home_logo": "https://api.sofascore.app/api/v1/team/2697/image",
+    "away_logo": "https://api.sofascore.app/api/v1/team/2689/image",
     "competizione": "Serie A",
     "servizio": "DAZN",
     "url": ""
