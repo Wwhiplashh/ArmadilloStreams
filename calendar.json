@@ -1,17 +1,5 @@
 [
   {
-    "data": "2026-11-25",
-    "ora": "20:00",
-    "partita": "Inter vs VfB Stuttgart",
-    "home_team": "Inter",
-    "away_team": "VfB Stuttgart",
-    "home_logo": "https://api.sofascore.app/api/v1/team/2697/image",
-    "away_logo": "https://api.sofascore.app/api/v1/team/2677/image",
-    "competizione": "UEFA Champions League",
-    "servizio": "Prime Video",
-    "url": ""
-  },
-  {
     "data": "2026-11-28",
     "ora": "19:45",
     "partita": "Inter vs Genoa",
@@ -355,6 +343,18 @@
     "away_team": "Inter",
     "home_logo": "https://api.sofascore.app/api/v1/team/2687/image",
     "away_logo": "https://api.sofascore.app/api/v1/team/2697/image",
+    "competizione": "Serie A",
+    "servizio": "DAZN",
+    "url": ""
+  },
+  {
+    "data": "2027-05-23",
+    "ora": "13:00",
+    "partita": "Inter vs Lazio",
+    "home_team": "Inter",
+    "away_team": "Lazio",
+    "home_logo": "https://api.sofascore.app/api/v1/team/2697/image",
+    "away_logo": "https://api.sofascore.app/api/v1/team/2699/image",
     "competizione": "Serie A",
     "servizio": "DAZN",
     "url": ""
